@@ -50,7 +50,7 @@ interface ColorItem {
 }
 
 const Product = () => {
-    const { id } = useParams<{ id: string }>();
+    const { slug } = useParams<{ slug: string }>();
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
     const { user, isAuthenticated } = useAppSelector((state) => state.auth);
@@ -61,8 +61,8 @@ const Product = () => {
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
     const { data, isLoading } = useQuery({
-        queryKey: ['product', id],
-        queryFn: () => api.get(`/products/${id}`),
+        queryKey: ['product', slug],
+        queryFn: () => api.get(`/products/name/${slug}`),
     });
 
     // Récupérer la catégorie du produit
@@ -410,9 +410,9 @@ const Product = () => {
             </Row>
 
             {/* Section Avis - Using ReviewList Component */}
-            {id && (
+            {slug && (
                 <ReviewList
-                    productId={id}
+                    productId={slug}
                     currentUserId={user?.id ? parseInt(user.id) : undefined}
                     isAdmin={user?.role === 'admin'}
                     isAuthenticated={isAuthenticated}

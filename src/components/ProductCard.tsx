@@ -32,7 +32,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
     };
 
     return (
-        <Link to={`/product/${product._id}`}>
+        <Link to={`/product/${encodeURIComponent(product.name)}`}>
             <Card
                 hoverable
                 cover={
