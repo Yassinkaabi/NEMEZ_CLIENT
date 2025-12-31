@@ -1,6 +1,5 @@
-import { Row, Col, Card, Typography, Spin, Button, Carousel } from 'antd';
+import { Row, Col, Typography, Spin, Button, Carousel } from 'antd';
 import { useQuery } from '@tanstack/react-query';
-import { Link } from 'react-router-dom';
 import { api } from '../services/api';
 import ProductCard from '../components/ProductCard';
 import { ArrowRightOutlined } from '@ant-design/icons';

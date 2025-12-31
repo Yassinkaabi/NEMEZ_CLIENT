@@ -1,5 +1,5 @@
 // src/components/InvoicePDF.tsx
-import { Document, Page, Text, View, StyleSheet, pdf, Image, Font } from '@react-pdf/renderer';
+import { Document, Page, Text, View, StyleSheet, pdf, Font } from '@react-pdf/renderer';
 
 // Police optionnelle (facultatif mais joli)
 Font.register({
