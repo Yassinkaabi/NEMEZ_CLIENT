@@ -12,21 +12,21 @@ const Navbar = () => {
     const { user } = useAppSelector((state: RootState) => state.auth);
     const cartItems = useAppSelector((state: any) => state.cart.items || []);
     const { categories } = useAppSelector((state: RootState) => state.categories);
-    const [searchValue, setSearchValue] = useState("");
+    // const [searchValue, setSearchValue] = useState("");
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
     useEffect(() => {
         dispatch(fetchCategories());
     }, [dispatch]);
 
-    const handleSearch = (e: React.FormEvent) => {
-        e.preventDefault();
-        if (searchValue.trim()) {
-            navigate(`/search?q=${searchValue.trim()}`);
-            setSearchValue("");
-            setMobileMenuOpen(false);
-        }
-    };
+    // const handleSearch = (e: React.FormEvent) => {
+    //     e.preventDefault();
+    //     if (searchValue.trim()) {
+    //         navigate(`/search?q=${searchValue.trim()}`);
+    //         setSearchValue("");
+    //         setMobileMenuOpen(false);
+    //     }
+    // };
 
     const handleLogout = () => {
         dispatch(logout());
@@ -41,12 +41,12 @@ const Navbar = () => {
                 <div className="navbar-container">
 
                     {/* Logo */}
-                    <div style={{ position: 'relative' }}>
-                        <Link to="/" className="navbar-logo">
-                            NEMEZ
-                        </Link>
-                        <img style={{ position: 'absolute' }} src="/images/logo.png" alt="" width={20} />
-                    </div>
+                    {/* <div style={{ position: 'relative' }}> */}
+                    <Link to="/" className="navbar-logo">
+                        <img src="/images/logocover.PNG" alt="" width={100} />
+                    </Link>
+                    {/* <img style={{ position: 'absolute' }} src="/images/logo.png" alt="" width={20} /> */}
+                    {/* </div> */}
 
                     {/* Menu Desktop */}
                     <nav className="navbar-menu-desktop">
@@ -63,7 +63,7 @@ const Navbar = () => {
                     <div className="navbar-actions">
 
                         {/* Recherche Desktop */}
-                        <form onSubmit={handleSearch} className="navbar-search-desktop">
+                        {/* <form onSubmit={handleSearch} className="navbar-search-desktop">
                             <input
                                 type="text"
                                 placeholder="Rechercher un produit..."
@@ -76,7 +76,7 @@ const Navbar = () => {
                                     <path d="m21 21-4.35-4.35" />
                                 </svg>
                             </button>
-                        </form>
+                        </form> */}
 
                         {/* Panier */}
                         <button
@@ -145,10 +145,12 @@ const Navbar = () => {
                 <div className="navbar-mobile-header">
                     <div style={{ position: 'relative' }}>
                         <Link to="/" className="navbar-logo">
-                            NEMEZ
+                            {/* NEMEZ */}
+                            <img src="/images/logocover.PNG" alt="" width={100} />
+                            <img style={{ position: 'absolute' }} src="/images/logo.png" alt="" width={20} />
                         </Link>
-                        <img style={{ position: 'absolute' }} src="/images/logo.png" alt="" width={20} />
-                    </div>                    <button className="close-btn" onClick={() => setMobileMenuOpen(false)}>
+                    </div>
+                    <button className="close-btn" onClick={() => setMobileMenuOpen(false)}>
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                             <path d="M18 6 6 18M6 6l12 12" />
                         </svg>
@@ -169,7 +171,7 @@ const Navbar = () => {
                     <Link to="/news" onClick={() => setMobileMenuOpen(false)}>News</Link>
                 </nav>
 
-                <form onSubmit={handleSearch} className="navbar-mobile-search">
+                {/* <form onSubmit={handleSearch} className="navbar-mobile-search">
                     <input
                         type="text"
                         placeholder="Rechercher..."
@@ -182,7 +184,7 @@ const Navbar = () => {
                             <path d="m21 21-4.35-4.35" />
                         </svg>
                     </button>
-                </form>
+                </form> */}
 
                 <div className="navbar-mobile-user">
                     {user ? (

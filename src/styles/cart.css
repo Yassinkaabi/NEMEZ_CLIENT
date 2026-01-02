@@ -1,0 +1,253 @@
+/* Cart.css */
+
+.cart-container {
+    max-width: 1200px;
+    margin: 40px auto;
+    padding: 0 20px;
+}
+
+.cart-title {
+    margin-bottom: 24px;
+}
+
+.cart-empty {
+    text-align: center;
+    padding: 100px 20px;
+}
+
+.cart-empty-button {
+    margin-top: 20px;
+}
+
+.cart-layout {
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+}
+
+.cart-table-section {
+    flex: 1;
+    min-width: 300px;
+}
+
+.cart-summary-section {
+    width: 100%;
+    max-width: 400px;
+}
+
+.cart-product-info {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.cart-product-image {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 8px;
+    flex-shrink: 0;
+}
+
+.cart-product-details {
+    flex: 1;
+}
+
+.cart-summary-card {
+    position: sticky;
+    top: 20px;
+}
+
+.cart-summary-divider {
+    margin: 20px 0;
+    border: none;
+    border-top: 1px solid #f0f0f0;
+}
+
+.cart-summary-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.cart-summary-total {
+    margin-top: 10px;
+}
+
+.cart-checkout-button {
+    margin-top: 20px;
+}
+
+/* Responsive Styles */
+
+/* Tablets */
+@media (max-width: 992px) {
+    .cart-container {
+        margin: 20px auto;
+        padding: 0 16px;
+    }
+
+    .cart-layout {
+        gap: 20px;
+    }
+
+    .cart-summary-section {
+        max-width: 100%;
+    }
+
+    .cart-summary-card {
+        position: static;
+    }
+}
+
+/* Mobile - Card Layout */
+@media (max-width: 768px) {
+    .cart-container {
+        margin: 16px auto;
+        padding: 0 12px;
+    }
+
+    .cart-empty {
+        padding: 60px 20px;
+    }
+
+    .cart-layout {
+        gap: 16px;
+    }
+
+    .cart-table-section {
+        min-width: 100%;
+    }
+
+    /* Hide table on mobile */
+    .cart-table-section .ant-table-wrapper {
+        display: none;
+    }
+
+    .cart-summary-card {
+        padding: 16px;
+    }
+}
+
+/* Mobile Cart Cards */
+.cart-mobile-list {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    .cart-mobile-list {
+        display: block;
+    }
+
+    .cart-item-card {
+        background: #fff;
+        border: 1px solid #f0f0f0;
+        border-radius: 8px;
+        padding: 16px;
+        margin-bottom: 16px;
+    }
+
+    .cart-item-header {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 16px;
+    }
+
+    .cart-item-image {
+        width: 100px;
+        height: 100px;
+        object-fit: cover;
+        border-radius: 8px;
+        flex-shrink: 0;
+    }
+
+    .cart-item-info {
+        flex: 1;
+    }
+
+    .cart-item-name {
+        font-size: 16px;
+        font-weight: 600;
+        margin-bottom: 4px;
+        display: block;
+    }
+
+    .cart-item-variant {
+        font-size: 13px;
+        color: #8c8c8c;
+        display: block;
+        margin-bottom: 8px;
+    }
+
+    .cart-item-price {
+        font-size: 18px;
+        font-weight: 600;
+        color: #E53935;
+    }
+
+    .cart-item-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-top: 12px;
+        border-top: 1px solid #f0f0f0;
+    }
+
+    .cart-item-quantity {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .cart-item-quantity-label {
+        font-size: 14px;
+        color: #595959;
+    }
+
+    .cart-item-total {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .cart-item-total-label {
+        font-size: 14px;
+        color: #595959;
+    }
+
+    .cart-item-total-price {
+        font-size: 18px;
+        font-weight: 600;
+        color: #E53935;
+    }
+
+    .cart-item-delete {
+        color: #ff4d4f;
+    }
+}
+
+/* Small Mobile */
+@media (max-width: 480px) {
+    .cart-container {
+        margin: 12px auto;
+        padding: 0 8px;
+    }
+
+    .cart-title {
+        font-size: 20px !important;
+    }
+
+    .cart-product-image {
+        height: 180px;
+    }
+
+    .cart-summary-card {
+        padding: 12px;
+    }
+
+    .cart-checkout-button {
+        font-size: 16px;
+        height: 48px;
+    }
+}

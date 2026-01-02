@@ -2,7 +2,7 @@ import { createSlice, createAsyncThunk, type PayloadAction } from '@reduxjs/tool
 import { api } from '../services/api';
 
 export interface User {
-    id: string;
+    _id: string;
     name: string;
     email: string;
     role: string;

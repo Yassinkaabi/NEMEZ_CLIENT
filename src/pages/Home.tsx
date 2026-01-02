@@ -29,20 +29,6 @@ const Home = () => {
     });
 
     const heroSlides = [
-        // {
-        //     image: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=1920&h=600&fit=crop',
-        //     title: 'Collection Hiver 2025',
-        //     subtitle: 'Découvrez les tendances de la saison',
-        //     cta: 'Découvrir',
-        //     overlay: 'rgba(0, 0, 0, 0.4)'
-        // },
-        // {
-        //     image: 'https://images.unsplash.com/photo-1483985988355-763728e1935b?w=1920&h=600&fit=crop',
-        //     title: 'Nouveautés Exclusives',
-        //     subtitle: 'Les dernières pièces qui font sensation',
-        //     cta: 'Voir la collection',
-        //     overlay: 'rgba(0, 0, 0, 0.45)'
-        // },
         {
             image: '/images/hero.jpeg',
             title: 'Style & Confort',
@@ -59,48 +45,21 @@ const Home = () => {
                 autoplay
                 effect="fade"
                 autoplaySpeed={5000}
-                style={{ marginBottom: 60 }}
+                className="hero-carousel"
             >
                 {heroSlides.map((slide, idx) => (
                     <div key={idx}>
                         <div
+                            className="hero-slide"
                             style={{
-                                position: 'relative',
-                                height: '90vh',
-                                background: `linear-gradient(${slide.overlay}, ${slide.overlay}), url(${slide.image}) center/cover`,
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
+                                backgroundImage: `linear-gradient(${slide.overlay}, ${slide.overlay}), url(${slide.image})`,
                             }}
                         >
-                            <div style={{
-                                textAlign: 'center',
-                                maxWidth: 800,
-                                padding: '0 20px',
-                                animation: 'fadeInUp 1s ease-out'
-                            }}>
-                                <Title
-                                    level={1}
-                                    style={{
-                                        color: '#fff',
-                                        fontSize: 56,
-                                        fontWeight: 700,
-                                        marginBottom: 20,
-                                        textShadow: '2px 2px 8px rgba(0,0,0,0.3)',
-                                        letterSpacing: '-1px'
-                                    }}
-                                >
+                            <div className="hero-content">
+                                <Title level={1} className="hero-title">
                                     {slide.title}
                                 </Title>
-                                <Paragraph
-                                    style={{
-                                        color: '#fff',
-                                        fontSize: 22,
-                                        marginBottom: 40,
-                                        textShadow: '1px 1px 4px rgba(0,0,0,0.3)',
-                                        fontWeight: 300
-                                    }}
-                                >
+                                <Paragraph className="hero-subtitle">
                                     {slide.subtitle}
                                 </Paragraph>
                                 <Button
@@ -108,26 +67,7 @@ const Home = () => {
                                     size="large"
                                     icon={<ArrowRightOutlined />}
                                     onClick={scrollToNouveautes}
-                                    style={{
-                                        height: 50,
-                                        padding: '0 40px',
-                                        fontSize: 16,
-                                        fontWeight: 600,
-                                        borderRadius: 25,
-                                        background: '#fff',
-                                        color: '#000',
-                                        border: 'none',
-                                        boxShadow: '0 4px 15px rgba(0,0,0,0.2)',
-                                        transition: 'all 0.3s ease'
-                                    }}
-                                    onMouseEnter={(e) => {
-                                        e.currentTarget.style.transform = 'translateY(-2px)';
-                                        e.currentTarget.style.boxShadow = '0 6px 20px rgba(0,0,0,0.3)';
-                                    }}
-                                    onMouseLeave={(e) => {
-                                        e.currentTarget.style.transform = 'translateY(0)';
-                                        e.currentTarget.style.boxShadow = '0 4px 15px rgba(0,0,0,0.2)';
-                                    }}
+                                    className="hero-button"
                                 >
                                     {slide.cta}
                                 </Button>
@@ -137,78 +77,8 @@ const Home = () => {
                 ))}
             </Carousel>
             <AdvertisementCarousel />
-            
+
             <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 20px' }}>
-                {/* <div style={{ textAlign: 'center', marginBottom: 50 }}>
-                    <Title level={2} style={{ fontSize: 36, fontWeight: 700, marginBottom: 10 }}>
-                        Nos Catégories
-                    </Title>
-                    <Paragraph style={{ fontSize: 16, color: '#666' }}>
-                        Explorez notre sélection par catégorie
-                    </Paragraph>
-                </div>
-
-                {categoriesLoading ? (
-                    <div style={{ textAlign: 'center', padding: 50 }}>
-                        <Spin size="large" />
-                    </div>
-                ) : (
-                    <Row gutter={[24, 24]} style={{ marginBottom: 80 }}>
-                        {categoriesData?.data?.categories?.map((category: any) => (
-                            <Col xs={24} sm={12} md={8} lg={6} key={category._id}>
-                                <Link to={`/category/${category._id}`}>
-                                    <Card
-                                        hoverable
-                                        cover={
-                                            <div style={{
-                                                height: 250,
-                                                overflow: 'hidden',
-                                                borderRadius: '8px 8px 0 0'
-                                            }}>
-                                                <img
-                                                    alt={category.name}
-                                                    src={category.image}
-                                                    style={{
-                                                        height: '100%',
-                                                        width: '100%',
-                                                        objectFit: 'cover',
-                                                        transition: 'transform 0.3s ease'
-                                                    }}
-                                                    onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.1)'}
-                                                    onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
-                                                />
-                                            </div>
-                                        }
-                                        style={{
-                                            borderRadius: 8,
-                                            border: '1px solid #f0f0f0',
-                                            boxShadow: '0 2px 8px rgba(0,0,0,0.06)'
-                                        }}
-                                    >
-                                        <Card.Meta
-                                            title={
-                                                <span style={{
-                                                    fontSize: 18,
-                                                    fontWeight: 600,
-                                                    color: '#000'
-                                                }}>
-                                                    {category.name}
-                                                </span>
-                                            }
-                                            description={
-                                                <span style={{ color: '#666' }}>
-                                                    {category.description}
-                                                </span>
-                                            }
-                                        />
-                                    </Card>
-                                </Link>
-                            </Col>
-                        ))}
-                    </Row>
-                )} */}
-
-                {/* Recent Products Section */}
                 <div ref={nouveautesRef} style={{ textAlign: 'center', marginBottom: 50, scrollMarginTop: 80 }}>
                     <Title level={2} style={{ fontSize: 36, fontWeight: 700, marginBottom: 10 }}>
                         Nouveautés
@@ -234,6 +104,91 @@ const Home = () => {
             </div>
 
             <style>{`
+                .hero-carousel {
+                    margin-bottom: 60px;
+                }
+                .hero-slide {
+                    position: relative;
+                    height: 90vh;
+                    background-position: center;
+                    background-size: 100% 100%;
+                    background-repeat: no-repeat;
+                    display: flex !important;
+                    align-items: center;
+                    justify-content: center;
+                }
+                .hero-content {
+                    text-align: center;
+                    max-width: 800px;
+                    padding: 0 20px;
+                    animation: fadeInUp 1s ease-out;
+                }
+                .hero-title.ant-typography {
+                    color: #fff;
+                    font-size: 56px;
+                    font-weight: 700;
+                    margin-bottom: 20px;
+                    text-shadow: 2px 2px 8px rgba(0,0,0,0.3);
+                    letter-spacing: -1px;
+                }
+                .hero-subtitle.ant-typography {
+                    color: #fff;
+                    font-size: 22px;
+                    margin-bottom: 40px;
+                    text-shadow: 1px 1px 4px rgba(0,0,0,0.3);
+                    font-weight: 300;
+                }
+                .hero-button {
+                    height: 50px;
+                    padding: 0 40px;
+                    font-size: 16px;
+                    font-weight: 600;
+                    border-radius: 25px;
+                    background: #fff;
+                    color: #000;
+                    border: none;
+                    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+                    transition: all 0.3s ease;
+                }
+                .hero-button:hover {
+                    transform: translateY(-2px);
+                    box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+                    background: #fff !important;
+                    color: #000 !important;
+                }
+
+                @media (max-width: 992px) {
+                    .hero-slide {
+                        height: 100vh;
+                        background-size: 160% 100%;
+                    }
+                    .hero-title.ant-typography {
+                        font-size: 42px;
+                    }
+                }
+
+                @media (max-width: 768px) {
+                    .hero-slide {
+                        height: 60vh;
+                    }
+                    .hero-title.ant-typography {
+                        font-size: 32px;
+                        margin-bottom: 15px;
+                    }
+                    .hero-subtitle.ant-typography {
+                        font-size: 18px;
+                        margin-bottom: 30px;
+                    }
+                    .hero-button {
+                        padding: 0 30px;
+                        height: 45px;
+                        font-size: 15px;
+                    }
+                    .hero-carousel {
+                        margin-bottom: 40px;
+                    }
+                }
+
                 @keyframes fadeInUp {
                     from {
                         opacity: 0;

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Space, Typography, Divider, Button, Spin, Empty, Pagination } from 'antd';
+import { Space, Typography, Divider, Button, Spin, Pagination } from 'antd';
 import { useQuery } from '@tanstack/react-query';
 import type { Review } from '../services/reviewService';
 import { reviewService } from '../services/reviewService';
@@ -130,10 +130,8 @@ const ReviewList = ({ productId, currentUserId, isAdmin, isAuthenticated }: Revi
 
             {/* Reviews List */}
             {reviews.length === 0 ? (
-                <Empty
-                    description="Aucun avis pour le moment"
-                    style={{ padding: '60px 0' }}
-                />
+                <>
+                </>
             ) : (
                 <>
                     <Space direction="vertical" size={0} style={{ width: '100%' }}>

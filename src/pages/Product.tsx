@@ -1,34 +1,14 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import {
-    Row,
-    Col,
-    Typography,
-    Button,
-    InputNumber,
-    Space,
-    message,
-    Rate,
-    Spin,
-    Breadcrumb,
-    Tag,
-} from 'antd';
-import {
-    LeftOutlined,
-    RightOutlined,
-    ShoppingCartOutlined,
-    HomeOutlined,
-    CheckCircleOutlined,
-    CloseCircleOutlined,
-} from '@ant-design/icons';
+import { ChevronLeft, ChevronRight, ShoppingCart, Home, Check, X, Minus, Plus } from 'lucide-react';
+import '../styles/product.css';
 import { api } from '../services/api';
+import { useToast } from '../hooks/use-toast';
 import { addToCart } from '../store/cartSlice';
 import { useAppDispatch, useAppSelector } from '../store/redux';
 import ReviewList from '../components/ReviewList';
-
-const { Title, Text } = Typography;
-const IMAGE_HEIGHT = 600;
+import type { RootState } from '../store';
 
 const COLOR_NAME_TO_HEX: Record<string, string> = {
     black: '#000000', noir: '#000000',
@@ -49,12 +29,17 @@ interface ColorItem {
     images: string[];
 }
 
+interface Variant {
+    size: string;
+    color: string;
+    stock: number;
+}
+
 const Product = () => {
     const { slug } = useParams<{ slug: string }>();
-    const dispatch = useAppDispatch();
     const navigate = useNavigate();
-    const { user, isAuthenticated } = useAppSelector((state) => state.auth);
-
+    const { toast } = useToast();
+    const dispatch = useAppDispatch()
     const [selectedSize, setSelectedSize] = useState<string>('');
     const [selectedColor, setSelectedColor] = useState<string>('');
     const [quantity, setQuantity] = useState(1);
@@ -65,26 +50,24 @@ const Product = () => {
         queryFn: () => api.get(`/products/name/${slug}`),
     });
 
-    // Récupérer la catégorie du produit
     const { data: categoryData } = useQuery({
         queryKey: ['category', data?.data?.product?.category],
         queryFn: () => api.get(`/categories/${data?.data?.product?.category}`),
         enabled: !!data?.data?.product?.category,
     });
 
+    const user = useAppSelector((state: RootState) => state.auth.user);
     const product = data?.data?.product;
-    const reviewStats = data?.data?.reviewStats;
+    // const reviewStats = data?.data?.reviewStats;
     const category = categoryData?.data?.category;
 
-    // Find the selected variant based on size and color
     const selectedVariant = product?.variants?.find(
-        (v: any) => v.size === selectedSize && v.color === selectedColor
+        (v: Variant) => v.size === selectedSize && v.color === selectedColor
     );
     const variantStock = selectedVariant?.stock || 0;
     const isInStock = variantStock > 0;
 
-    // Calculate total stock across all variants
-    const totalStock = product?.variants?.reduce((sum: number, v: any) => sum + v.stock, 0) || 0;
+    const totalStock = product?.variants?.reduce((sum: number, v: Variant) => sum + v.stock, 0) || 0;
 
     const normalizedColors: ColorItem[] = Array.isArray(product?.colors)
         ? product.colors.map((c: any) => {
@@ -97,10 +80,8 @@ const Product = () => {
                     images: product.images || [],
                 };
             }
-
             const value = (c.value || c.name || '').toString().toLowerCase();
             const hex = c.hex || COLOR_NAME_TO_HEX[value] || '#000000';
-
             return {
                 name: c.name || c.value || value,
                 value,
@@ -122,21 +103,33 @@ const Product = () => {
         if (normalizedColors.length > 0 && !selectedColor) {
             setSelectedColor(normalizedColors[0].value);
         }
-    }, [sizes, normalizedColors]);
+    }, [sizes, normalizedColors, selectedSize, selectedColor]);
 
     const handleAddToCart = () => {
         if (!selectedSize || !selectedColor) {
-            message.warning('Veuillez choisir une taille et une couleur');
+            toast({
+                title: "Selection required",
+                description: "Please choose a size and color",
+                variant: "destructive",
+            });
             return;
         }
 
         if (!isInStock) {
-            message.error(`La variante ${selectedSize} / ${selectedColor} est en rupture de stock`);
+            toast({
+                title: "Out of stock",
+                description: `${selectedSize} / ${selectedColor} is currently unavailable`,
+                variant: "destructive",
+            });
             return;
         }
 
         if (quantity > variantStock) {
-            message.warning(`Seulement ${variantStock} article${variantStock > 1 ? 's' : ''} disponible${variantStock > 1 ? 's' : ''} pour cette variante`);
+            toast({
+                title: "Limited stock",
+                description: `Only ${variantStock} item${variantStock > 1 ? 's' : ''} available`,
+                variant: "destructive",
+            });
             return;
         }
 
@@ -151,13 +144,17 @@ const Product = () => {
                 quantity,
             })
         );
-        message.success('Ajouté au panier !');
+
+        toast({
+            title: "Added to cart!",
+            description: `${product.name} (${selectedSize}, ${selectedColor}) × ${quantity}`,
+        });
     };
 
     if (isLoading) {
         return (
-            <div style={{ textAlign: 'center', padding: '100px 0' }}>
-                <Spin size="large" />
+            <div className="loading-container">
+                <div className="spinner" />
             </div>
         );
     }
@@ -166,256 +163,205 @@ const Product = () => {
         navigate(-1);
     };
 
-    // Breadcrumb items dynamiques
-    const breadcrumbItems = [
-        {
-            title: (
-                <Link to="/" style={{ color: '#666' }}>
-                    <HomeOutlined style={{ marginRight: 4 }} />
-                    Accueil
-                </Link>
-            ),
-        },
-        {
-            title: category ? (
-                <Link to={`/category/${category._id}`} style={{ color: '#666' }}>
-                    {category.name}
-                </Link>
-            ) : (
-                <span style={{ color: '#999' }}>Catégorie</span>
-            ),
-        },
-        {
-            title: <span style={{ color: '#000', fontWeight: 500 }}>{product?.name}</span>,
-        },
-    ];
+    // const renderStars = (rating: number) => {
+    //     return Array.from({ length: 5 }, (_, i) => (
+    //         <Star
+    //             key={i}
+    //             className={`star ${i < Math.floor(rating) ? '' : 'star--empty'}`}
+    //             fill={i < Math.floor(rating) ? 'currentColor' : 'none'}
+    //         />
+    //     ));
+    // };
 
     return (
-        <div style={{ maxWidth: 1400, margin: '0 auto', padding: '20px' }}>
-            {/* Bouton retour + Breadcrumb */}
-            <div style={{ marginBottom: 20 }}>
-                <Button
-                    type="text"
-                    icon={<LeftOutlined />}
-                    onClick={handleBack}
-                    style={{ marginBottom: 12, padding: '4px 8px' }}
-                >
-                    Retour
-                </Button>
+        <div className="product-page">
+            {/* Navigation */}
+            <nav className="product-nav">
+                <button className="back-button" onClick={handleBack}>
+                    <ChevronLeft size={18} />
+                    <span>Back</span>
+                </button>
 
-                <Breadcrumb
-                    items={breadcrumbItems}
-                    separator="›"
-                    style={{ fontSize: 14 }}
-                />
-            </div>
+                <div className="breadcrumb">
+                    <Link to="/" className="breadcrumb-link">
+                        <Home size={14} style={{ marginRight: 4, display: 'inline' }} />
+                        Home
+                    </Link>
+                    <span className="breadcrumb-separator">›</span>
+                    {category ? (
+                        <Link to={`/category/${category._id}`} className="breadcrumb-link">
+                            {category.name}
+                        </Link>
+                    ) : (
+                        <span className="breadcrumb-link">Category</span>
+                    )}
+                    <span className="breadcrumb-separator">›</span>
+                    <span className="breadcrumb-current">{product?.name}</span>
+                </div>
+            </nav>
 
-            <Row gutter={60} style={{ marginTop: 40 }}>
-                {/* ==================== IMAGES ==================== */}
-                <Col xs={24} lg={12}>
-                    <div style={{ position: 'relative', display: 'flex', alignItems: 'center', flexDirection: 'column' }}>
-                        <div style={{ borderRadius: 12, overflow: 'hidden', textAlign: 'center', marginBottom: 16, width: '100%', height: IMAGE_HEIGHT, background: '#f5f5f5' }}>
-                            <img
-                                src={currentColorImages[currentImageIndex] || '/placeholder.jpg'}
-                                alt={`${product?.name} - ${selectedColor}`}
-                                style={{ width: '100%', height: '100%', objectPosition: 'center top' }}
-                            />
-                        </div>
+            <div className="product-grid">
+                {/* Image Gallery */}
+                <div className="image-gallery">
+                    <div className="main-image-container">
+                        <img
+                            src={currentColorImages[currentImageIndex] || '/placeholder.jpg'}
+                            alt={`${product?.name} - ${selectedColor}`}
+                            className="main-image"
+                        />
 
                         {currentColorImages.length > 1 && (
                             <>
-                                <Button shape="circle" icon={<LeftOutlined />}
-                                    style={{ position: 'absolute', top: '40%', left: 16, transform: 'translateY(-50%)', zIndex: 10 }}
-                                    onClick={() => setCurrentImageIndex(i => i === 0 ? currentColorImages.length - 1 : i - 1)} />
-                                <Button shape="circle" icon={<RightOutlined />}
-                                    style={{ position: 'absolute', top: '40%', right: 16, transform: 'translateY(-50%)', zIndex: 10 }}
-                                    onClick={() => setCurrentImageIndex(i => i === currentColorImages.length - 1 ? 0 : i + 1)} />
+                                <button
+                                    className="nav-button nav-button--prev"
+                                    onClick={() => setCurrentImageIndex(i => i === 0 ? currentColorImages.length - 1 : i - 1)}
+                                >
+                                    <ChevronLeft size={20} />
+                                </button>
+                                <button
+                                    className="nav-button nav-button--next"
+                                    onClick={() => setCurrentImageIndex(i => i === currentColorImages.length - 1 ? 0 : i + 1)}
+                                >
+                                    <ChevronRight size={20} />
+                                </button>
                             </>
                         )}
-
-                        <Space size={12} style={{ justifyContent: 'center', display: 'flex', flexWrap: 'wrap', marginTop: 20 }}>
-                            {currentColorImages.map((img: string, idx: number) => (
-                                <div
-                                    key={idx}
-                                    onClick={() => setCurrentImageIndex(idx)}
-                                    style={{
-                                        cursor: 'pointer',
-                                        borderRadius: 8,
-                                        overflow: 'hidden',
-                                        border: currentImageIndex === idx ? '2px solid #000' : '2px solid transparent',
-                                        width: 80,
-                                        height: 106,
-                                    }}
-                                >
-                                    <img src={img} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                                </div>
-                            ))}
-                        </Space>
-                    </div>
-                </Col>
-
-                {/* ==================== INFOS ==================== */}
-                <Col xs={24} lg={12}>
-                    <Title level={1} style={{ margin: '0 0 16px', fontWeight: 500 }}>
-                        {product?.name}
-                    </Title>
-
-                    <Space size={4} style={{ marginBottom: 16 }}>
-                        <Rate
-                            disabled
-                            value={reviewStats?.averageRating || 0}
-                            allowHalf
-                            style={{ fontSize: 20 }}
-                        />
-                        <Text type="secondary">
-                            ({reviewStats?.averageRating?.toFixed(1) || '0.0'}) · {reviewStats?.totalReviews || 0} avis
-                        </Text>
-                    </Space>
-
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '16px', margin: '24px 0 16px' }}>
-                        <Title level={2} style={{ margin: 0 }}>
-                            {product?.price} TND
-                        </Title>
-                        <Tag
-                            icon={isInStock ? <CheckCircleOutlined /> : <CloseCircleOutlined />}
-                            color={isInStock ? 'success' : 'error'}
-                            style={{
-                                fontSize: '14px',
-                                padding: '4px 12px',
-                                fontWeight: 600,
-                                border: 'none'
-                            }}
-                        >
-                            {isInStock ? 'En Stock' : 'Hors Stock'}
-                        </Tag>
                     </div>
 
-                    {selectedSize && selectedColor && (
-                        <>
-                            {isInStock ? (
-                                <Text type="secondary" style={{ display: 'block', marginBottom: '32px', fontSize: '14px' }}>
-                                    <strong>{variantStock}</strong> {variantStock === 1 ? 'article disponible' : 'articles disponibles'} pour {selectedSize} / {selectedColor}
-                                </Text>
-                            ) : (
-                                <Text type="danger" style={{ display: 'block', marginBottom: '32px', fontSize: '14px' }}>
-                                    Cette variante ({selectedSize} / {selectedColor}) est en rupture de stock
-                                </Text>
-                            )}
-                        </>
+                    <div className="thumbnails">
+                        {currentColorImages.map((img: string, idx: number) => (
+                            <div
+                                key={idx}
+                                onClick={() => setCurrentImageIndex(idx)}
+                                className={`thumbnail ${currentImageIndex === idx ? 'thumbnail--active' : ''}`}
+                            >
+                                <img src={img} alt={`${product?.name} view ${idx + 1}`} />
+                            </div>
+                        ))}
+                    </div>
+                </div>
+
+                {/* Product Info */}
+                <div className="product-info">
+                    <h1 className="product-title">{product?.name}</h1>
+
+                    {/* <div className="rating-container">
+                        <div className="stars">
+                            {renderStars(reviewStats?.averageRating || 0)}
+                        </div>
+                        <span className="rating-text">
+                            ({reviewStats?.averageRating?.toFixed(1) || '0.0'}) · {reviewStats?.totalReviews || 0} reviews
+                        </span>
+                    </div> */}
+
+                    <div className="price-stock">
+                        <div style={{display:'flex',alignItems:'center',gap:'5px'}}>
+                            <h1 className="price">{product?.price}</h1>
+                            <span style={{ fontSize: '16px' }}>TND</span>
+                        </div>
+                        <span className={`stock-badge ${isInStock ? 'stock-badge--in-stock' : 'stock-badge--out-of-stock'}`}>
+                            {isInStock ? <Check size={14} /> : <X size={14} />}
+                            {isInStock ? 'In Stock' : 'Out of Stock'}
+                        </span>
+                    </div>
+
+                    {selectedSize && selectedColor && isInStock && variantStock < 10 && (
+                        <p className="stock-info">
+                            <strong>{variantStock}</strong> {variantStock === 1 ? 'item available' : 'items available'} for {selectedSize} / {selectedColor}
+                        </p>
                     )}
+
                     {(!selectedSize || !selectedColor) && totalStock > 0 && (
-                        <Text type="secondary" style={{ display: 'block', marginBottom: '32px', fontSize: '14px' }}>
-                            {totalStock} {totalStock === 1 ? 'article disponible' : 'articles disponibles'} au total
-                        </Text>
+                        <p className="stock-info">
+                            {totalStock} {totalStock === 1 ? 'item available' : 'items available'} total
+                        </p>
                     )}
 
-                    <div style={{ display: 'flex', gap: '100px', marginBottom: '35px' }}>
-                        <div>
-                            <Text strong style={{ display: 'block', marginBottom: 12, fontSize: 15 }}>Available Size</Text>
-                            <div style={{
-                                display: "flex",
-                                flexWrap: "wrap",
-                                gap: "12px",
-                                maxWidth: "240px",
-                            }}>
-                                {sizes.map((size) => (
-                                    <Button
-                                        key={size}
-                                        type={selectedSize === size ? 'primary' : 'default'}
-                                        style={{
-                                            width: 50,
-                                            height: 50,
-                                            borderRadius: 8,
-                                            background: selectedSize === size ? '#000' : '#fff',
-                                            color: selectedSize === size ? '#fff' : '#000',
-                                            border: '1px solid #d9d9d9',
-                                            display: 'flex',
-                                        }}
-                                        onClick={() => setSelectedSize(size)}
-                                    >
-                                        {size}
-                                    </Button>
-                                ))}
+                    <div className="variant-selectors">
+                        <div className="variant-group">
+                            <span className="variant-label">Available Size</span>
+                            <div className="size-options">
+                                {sizes.map((size) => {
+                                    const sizeVariants = product?.variants?.filter((v: Variant) => v.size === size) || [];
+                                    const isSizeInStock = sizeVariants.reduce((sum: number, v: Variant) => sum + (v.stock || 0), 0) > 0;
+
+                                    return (
+                                        <button
+                                            key={size}
+                                            className={`size-button ${selectedSize === size ? 'size-button--selected' : ''} ${!isSizeInStock ? 'size-button--disabled' : ''}`}
+                                            onClick={() => setSelectedSize(size)}
+                                        >
+                                            {size}
+                                            {!isSizeInStock && <div className="size-button__strikethrough" />}
+                                        </button>
+                                    );
+                                })}
                             </div>
                         </div>
 
-                        <div>
-                            <Text strong style={{ display: 'block', marginBottom: 12, fontSize: 15 }}>Available Color</Text>
-                            <Space size={16}>
+                        <div className="variant-group">
+                            <span className="variant-label">Available Color</span>
+                            <div className="color-options">
                                 {normalizedColors.map((color) => {
-                                    const isSelected = selectedColor === color.value;
+                                    const colorVariant = product?.variants?.find(
+                                        (v: Variant) => v.size === selectedSize && (v.color === color.value || v.color === color.name)
+                                    );
+                                    const isColorInStock = (colorVariant?.stock || 0) > 0;
 
                                     return (
-                                        <div
+                                        <button
                                             key={color.value}
                                             onClick={() => setSelectedColor(color.value)}
-                                            style={{
-                                                width: 40,
-                                                height: 40,
-                                                borderRadius: "50%",
-                                                display: "flex",
-                                                alignItems: "center",
-                                                justifyContent: "center",
-                                                cursor: "pointer",
-                                                border: isSelected ? "3px solid #222" : "",
-                                                padding: 8,
-                                                boxShadow: isSelected ? "0 0 0 3px #fff" : "",
-                                                transition: "all 0.15s ease",
-                                            }}
+                                            className={`color-button ${selectedColor === color.value ? 'color-button--selected' : ''} ${!isColorInStock ? 'color-button--disabled' : ''}`}
                                             title={color.name}
                                         >
-                                            <div
-                                                style={{
-                                                    width: "100%",
-                                                    height: "100%",
-                                                    borderRadius: "50%",
-                                                    background: color.hex,
-                                                }}
-                                            />
-                                        </div>
+                                            <div className="color-swatch" style={{ background: color.hex }} />
+                                            {!isColorInStock && <div className="color-button__strikethrough" />}
+                                        </button>
                                     );
                                 })}
-                            </Space>
+                            </div>
                         </div>
                     </div>
 
-                    <Space size={16} align="center">
-                        <InputNumber
-                            min={1}
-                            max={isInStock ? variantStock : 0}
-                            value={quantity}
-                            onChange={(v) => setQuantity(v || 1)}
-                            style={{ width: 140 }}
-                            disabled={!isInStock}
-                        />
-                        <Button
-                            type="primary"
-                            size="large"
-                            icon={<ShoppingCartOutlined />}
+                    <div className="actions-row">
+                        <div className={`quantity-selector ${!isInStock ? 'quantity-selector--disabled' : ''}`}>
+                            <button
+                                className="quantity-button"
+                                disabled={!isInStock || quantity <= 1}
+                                onClick={() => setQuantity(q => Math.max(1, q - 1))}
+                            >
+                                <Minus size={16} />
+                            </button>
+                            <span className="quantity-value">{quantity}</span>
+                            <button
+                                className="quantity-button"
+                                disabled={!isInStock || quantity >= variantStock}
+                                onClick={() => setQuantity(q => Math.min(variantStock, q + 1))}
+                            >
+                                <Plus size={16} />
+                            </button>
+                        </div>
+
+                        <button
+                            className="add-to-cart-button"
                             onClick={handleAddToCart}
                             disabled={!isInStock}
-                            style={{
-                                background: isInStock ? '#000' : '#d9d9d9',
-                                border: 'none',
-                                borderRadius: 8,
-                                height: 56,
-                                padding: '0 40px',
-                                cursor: isInStock ? 'pointer' : 'not-allowed'
-                            }}
                         >
-                            {isInStock ? 'Add to cart' : 'Indisponible'}
-                        </Button>
-                    </Space>
-                </Col>
-            </Row>
+                            <ShoppingCart size={18} />
+                            {isInStock ? 'Add to Cart' : 'Unavailable'}
+                        </button>
+                    </div>
+                </div>
+            </div>
 
-            {/* Section Avis - Using ReviewList Component */}
-            {slug && (
+
+            {user?._id && (
                 <ReviewList
-                    productId={slug}
-                    currentUserId={user?.id ? parseInt(user.id) : undefined}
+                    productId={product?.id}
+                    currentUserId={user?._id ? parseInt(user._id) : undefined}
                     isAdmin={user?.role === 'admin'}
-                    isAuthenticated={isAuthenticated}
+                    isAuthenticated={user !== null}
                 />
             )}
         </div>

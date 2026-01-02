@@ -27,6 +27,8 @@ import AdminNewsletter from './pages/admin/AdminNewsletter';
 import UnsubscribeResult from './pages/UnsubscribePage';
 import NewsPage from './pages/News';
 
+import { Toaster } from './components/ui/toaster';
+
 const { Content } = Layout;
 
 function App() {
@@ -41,7 +43,12 @@ function App() {
       }
     }, [dispatch]);
 
-    return <>{children}</>;
+    return (
+      <>
+        {children}
+        <Toaster />
+      </>
+    );
   }
 
   function AppLayout() {

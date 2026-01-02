@@ -21,10 +21,9 @@
 }
 
 .navbar-logo {
-    font-size: 28px;
-    font-weight: bold;
     color: #E53935;
     text-decoration: none;
+    display: flex;
 }
 
 .navbar-menu-desktop {

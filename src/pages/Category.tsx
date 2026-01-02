@@ -63,7 +63,7 @@ const Category = () => {
                     <div style={{ background: '#fff', padding: 20, borderRadius: 8 }}>
                         <Title level={4}>Filtres</Title>
 
-                        <Collapse defaultActiveKey={['1', '2', '3']} ghost>
+                        <Collapse defaultActiveKey={['1']} ghost>
                             <Panel header="Prix" key="1">
                                 <Slider
                                     range
