@@ -1,5 +1,4 @@
-// pages/Cart.tsx
-import { Table, Button, Typography, Empty, Card } from 'antd';
+import { Table, Button, Typography, Empty, Card, message } from 'antd';
 import { DeleteOutlined, PlusOutlined, MinusOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { useAppSelector, useAppDispatch } from '../store/redux';
@@ -11,98 +10,122 @@ const { Title, Text } = Typography;
 const Cart = () => {
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
-    const cartItems = useAppSelector((state) => state.cart.items);
+    const cartItems = useAppSelector(state => state.cart.items);
 
-    const total = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+    const total = cartItems.reduce(
+        (sum, item) => sum + item.price * item.quantity,
+        0
+    );
 
+    // =======================
+    // Desktop Table Columns
+    // =======================
     const columns = [
         {
             title: 'Produit',
-            dataIndex: 'name',
-            key: 'name',
-            render: (text: string, record: any) => (
+            key: 'product',
+            render: (_: any, record: any) => (
                 <div className="cart-product-info">
-                    <img 
-                        src={record.image} 
-                        alt={text} 
+                    <img
+                        src={record.image}
+                        alt={record.name}
                         className="cart-product-image"
                     />
                     <div className="cart-product-details">
-                        <Text strong>{text}</Text>
+                        <Text strong>{record.name}</Text>
                         <br />
-                        <Text type="secondary">Taille: {record.size} | Couleur: {record.color}</Text>
+                        <Text type="secondary">
+                            Taille: {record.size} | Couleur: {record.color}
+                        </Text>
                     </div>
                 </div>
-            )
+            ),
         },
         {
             title: 'Prix',
             dataIndex: 'price',
             key: 'price',
-            render: (price: number) => <Text strong>{price} DT</Text>
+            render: (price: number) => <Text strong>{price} DT</Text>,
         },
         {
             title: 'Quantité',
-            dataIndex: 'quantity',
             key: 'quantity',
-            render: (qty: number, record: any) => (
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <Button
-                        icon={<MinusOutlined />}
-                        size="small"
-                        onClick={() => dispatch(updateQuantity({ 
-                            productId: record.productId, 
-                            quantity: Math.max(1, qty - 1) 
-                        }))}
-                        disabled={qty <= 1}
-                    />
-                    <span style={{ minWidth: '30px', textAlign: 'center', fontWeight: 500 }}>
-                        {qty}
-                    </span>
-                    <Button
-                        icon={<PlusOutlined />}
-                        size="small"
-                        onClick={() => dispatch(updateQuantity({ 
-                            productId: record.productId, 
-                            quantity: Math.min(10, qty + 1) 
-                        }))}
-                        disabled={qty >= 10}
-                    />
-                </div>
-            )
+            render: (_: any, record: any) => {
+                const isMax = record.quantity >= record.maxStock;
+
+                return (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                        <Button
+                            icon={<MinusOutlined />}
+                            size="small"
+                            disabled={record.quantity <= 1}
+                            onClick={() =>
+                                dispatch(
+                                    updateQuantity({
+                                        cartItemId: record.cartItemId,
+                                        quantity: record.quantity - 1,
+                                    })
+                                )
+                            }
+                        />
+
+                        <span style={{ minWidth: 30, textAlign: 'center' }}>
+                            {record.quantity}
+                        </span>
+
+                        <Button
+                            icon={<PlusOutlined />}
+                            size="small"
+                            disabled={isMax}
+                            onClick={() => {
+                                if (isMax) {
+                                    message.warning('Stock maximum atteint');
+                                    return;
+                                }
+
+                                dispatch(
+                                    updateQuantity({
+                                        cartItemId: record.cartItemId,
+                                        quantity: record.quantity + 1,
+                                    })
+                                );
+                            }}
+                        />
+                    </div>
+                );
+            },
         },
         {
             title: 'Total',
             key: 'total',
-            render: (record: any) => (
+            render: (_: any, record: any) => (
                 <Text strong style={{ color: '#E53935' }}>
                     {record.price * record.quantity} DT
                 </Text>
-            )
+            ),
         },
         {
             title: 'Action',
             key: 'action',
-            render: (record: any) => (
+            render: (_: any, record: any) => (
                 <Button
                     type="text"
                     danger
                     icon={<DeleteOutlined />}
-                    onClick={() => dispatch(removeFromCart(record.productId))}
+                    onClick={() => dispatch(removeFromCart(record.cartItemId))}
                 />
-            )
-        }
+            ),
+        },
     ];
 
+    // =======================
+    // Empty Cart
+    // =======================
     if (cartItems.length === 0) {
         return (
             <div className="cart-empty">
                 <Empty description="Votre panier est vide" />
-                <Button 
-                    type="primary" 
-                    onClick={() => navigate('/')} 
-                    className="cart-empty-button"
-                >
+                <Button type="primary" onClick={() => navigate('/')}>
                     Continuer les achats
                 </Button>
             </div>
@@ -116,98 +139,141 @@ const Cart = () => {
             </Title>
 
             <div className="cart-layout">
+                {/* =======================
+            TABLE DESKTOP
+        ======================= */}
                 <div className="cart-table-section">
-                    {/* Desktop Table View */}
                     <Table
                         dataSource={cartItems}
                         columns={columns}
+                        rowKey={(item) => `${item.cartItemId}-${item.size}-${item.color}`}
                         pagination={false}
-                        rowKey="productId"
                     />
 
-                    {/* Mobile Card View */}
+                    {/* =======================
+              MOBILE VIEW
+          ======================= */}
                     <div className="cart-mobile-list">
-                        {cartItems.map((item) => (
-                            <div key={item.productId} className="cart-item-card">
-                                <div className="cart-item-header">
-                                    <img 
-                                        src={item.image} 
-                                        alt={item.name} 
-                                        className="cart-item-image"
-                                    />
-                                    <div className="cart-item-info">
-                                        <span className="cart-item-name">{item.name}</span>
-                                        <span className="cart-item-variant">
-                                            Taille: {item.size} | Couleur: {item.color}
-                                        </span>
-                                        <span className="cart-item-price">{item.price} DT</span>
-                                    </div>
-                                </div>
-                                
-                                <div className="cart-item-footer">
-                                    <div className="cart-item-quantity">
-                                        <span className="cart-item-quantity-label">Quantité:</span>
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                            <Button
-                                                icon={<MinusOutlined />}
-                                                size="small"
-                                                onClick={() => dispatch(updateQuantity({ 
-                                                    productId: item.productId, 
-                                                    quantity: Math.max(1, item.quantity - 1) 
-                                                }))}
-                                                disabled={item.quantity <= 1}
-                                            />
-                                            <span style={{ minWidth: '30px', textAlign: 'center', fontWeight: 500 }}>
-                                                {item.quantity}
+                        {cartItems.map((item, index) => {
+                            const isMax = item.quantity >= item.maxStock;
+                            console.log(
+                                cartItems.map(item => ({
+                                    cartItemId: item.cartItemId,
+                                    productId: item.productId,
+                                    size: item.size,
+                                    color: item.color,
+                                }))
+                            );
+                            return (
+                                <div key={`${item.cartItemId}-${index}`} className="cart-item-card">
+                                    <div className="cart-item-header">
+                                        <img
+                                            src={item.image}
+                                            alt={item.name}
+                                            className="cart-item-image"
+                                        />
+
+                                        <div className="cart-item-info">
+                                            <span className="cart-item-name">{item.name}</span>
+                                            <span className="cart-item-variant">
+                                                Taille: {item.size} | Couleur: {item.color}
                                             </span>
+                                            <span className="cart-item-price">
+                                                {item.price} DT
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <div className="cart-item-footer">
+                                        <div className="cart-item-quantity">
+                                            <span>Quantité</span>
+
+                                            <div style={{ display: 'flex', gap: 8 }}>
+                                                <Button
+                                                    icon={<MinusOutlined />}
+                                                    size="small"
+                                                    disabled={item.quantity <= 1}
+                                                    onClick={() =>
+                                                        dispatch(
+                                                            updateQuantity({
+                                                                cartItemId: item.cartItemId,
+                                                                quantity: item.quantity - 1,
+                                                            })
+                                                        )
+                                                    }
+                                                />
+
+                                                <span>{item.quantity}</span>
+
+                                                <Button
+                                                    icon={<PlusOutlined />}
+                                                    size="small"
+                                                    disabled={isMax}
+                                                    onClick={() => {
+                                                        if (isMax) {
+                                                            message.warning('Stock maximum atteint');
+                                                            return;
+                                                        }
+
+                                                        dispatch(
+                                                            updateQuantity({
+                                                                cartItemId: item.cartItemId,
+                                                                quantity: item.quantity + 1,
+                                                            })
+                                                        );
+                                                    }}
+                                                />
+                                            </div>
+
+                                            {isMax && (
+                                                <Text type="danger" style={{ fontSize: 12 }}>
+                                                    Stock maximum atteint
+                                                </Text>
+                                            )}
+                                        </div>
+
+                                        <div className="cart-item-total">
+                                            <span>Total</span>
+                                            <span className="cart-item-total-price">
+                                                {item.price * item.quantity} DT
+                                            </span>
+
                                             <Button
-                                                icon={<PlusOutlined />}
+                                                type="text"
+                                                danger
+                                                icon={<DeleteOutlined />}
                                                 size="small"
-                                                onClick={() => dispatch(updateQuantity({ 
-                                                    productId: item.productId, 
-                                                    quantity: Math.min(10, item.quantity + 1) 
-                                                }))}
-                                                disabled={item.quantity >= 10}
+                                                onClick={() =>
+                                                    dispatch(removeFromCart(item.cartItemId))
+                                                }
                                             />
                                         </div>
                                     </div>
-                                    
-                                    <div className="cart-item-total">
-                                        <span className="cart-item-total-label">Total:</span>
-                                        <span className="cart-item-total-price">
-                                            {item.price * item.quantity} DT
-                                        </span>
-                                        <Button
-                                            type="text"
-                                            danger
-                                            icon={<DeleteOutlined />}
-                                            onClick={() => dispatch(removeFromCart(item.productId))}
-                                            className="cart-item-delete"
-                                            size="small"
-                                        />
-                                    </div>
                                 </div>
-                            </div>
-                        ))}
+                            );
+                        })}
                     </div>
                 </div>
 
+                {/* =======================
+            SUMMARY
+        ======================= */}
                 <div className="cart-summary-section">
                     <Card className="cart-summary-card">
                         <Title level={4}>Résumé de la commande</Title>
-                        
+
                         <div className="cart-summary-row">
                             <Text>Sous-total</Text>
                             <Text strong>{total} DT</Text>
                         </div>
-                        
+
                         <div className="cart-summary-row">
                             <Text>Livraison</Text>
                             <Text strong>7 DT</Text>
                         </div>
-                        
+
                         <hr className="cart-summary-divider" />
-                        
+
                         <div className="cart-summary-row cart-summary-total">
                             <Title level={4}>Total</Title>
                             <Title level={4} style={{ color: '#E53935' }}>
@@ -215,12 +281,11 @@ const Cart = () => {
                             </Title>
                         </div>
 
-                        <Button 
-                            type="primary" 
-                            size="large" 
-                            block 
+                        <Button
+                            type="primary"
+                            size="large"
+                            block
                             onClick={() => navigate('/checkout')}
-                            className="cart-checkout-button"
                         >
                             Passer la commande
                         </Button>

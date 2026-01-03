@@ -4,6 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import { api } from '../services/api';
 import { useAppSelector, useAppDispatch } from '../store/redux';
 import { clearCart } from '../store/cartSlice';
+import { useEffect } from 'react';
+import { loadUserProfile } from '../store/authSlice';
 
 const { Title, Text } = Typography;
 
@@ -13,6 +15,21 @@ const Checkout = () => {
     const dispatch = useAppDispatch();
     const [form] = Form.useForm();
     const cartItems = useAppSelector((state) => state.cart.items);
+
+    useEffect(() => {
+        dispatch(loadUserProfile());
+    }, [dispatch]);
+
+    useEffect(() => {
+        if (user) {
+            form.setFieldsValue({
+                name: user.name,
+                email: user.email,
+                phone: user.phone,
+                address: user.address
+            });
+        }
+    }, [user, form]);
 
     const createOrderMutation = useMutation({
         mutationFn: (orderData: any) => api.post('/orders', orderData),
@@ -60,8 +77,8 @@ const Checkout = () => {
             <Card style={{ marginBottom: 20 }}>
                 <Title level={4}>Résumé</Title>
                 {cartItems.map(item => (
-                    <div key={item.productId} style={{ marginBottom: 10 }}>
-                        <Text>{item.name} x {item.quantity} - </Text>
+                    <div key={item.cartItemId} style={{ marginBottom: 10, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <Text>{item.name} x {item.quantity} - {item.size} - {item.color}</Text>
                         <Text strong>{item.price * item.quantity} DT</Text>
                     </div>
                 ))}

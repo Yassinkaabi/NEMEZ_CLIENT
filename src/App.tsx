@@ -35,13 +35,13 @@ function App() {
 
   function AppInitializer({ children }: { children: React.ReactNode }) {
     const dispatch = useAppDispatch();
+    const token = localStorage.getItem('accessToken');
 
     useEffect(() => {
-      const token = localStorage.getItem('accessToken');
       if (token) {
         dispatch(loadUserProfile());
       }
-    }, [dispatch]);
+    }, [token, dispatch]);
 
     return (
       <>

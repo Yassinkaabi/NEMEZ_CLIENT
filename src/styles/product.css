@@ -58,6 +58,8 @@
     color: hsl(var(--muted-foreground));
     text-decoration: none;
     transition: var(--transition-smooth);
+    display: flex;
+    align-items: center;
 }
 
 .breadcrumb-link:hover {
@@ -65,7 +67,8 @@
 }
 
 .breadcrumb-separator {
-    color: hsl(var(--border));
+    color: hsl(30deg 10.02% 41.65%);
+    font-size: 18px;
 }
 
 .breadcrumb-current {

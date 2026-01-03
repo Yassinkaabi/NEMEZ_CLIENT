@@ -21,13 +21,15 @@ const ProductCard = ({ product }: ProductCardProps) => {
         if (!isInStock) return;
 
         dispatch(addToCart({
+            cartItemId: `${product._id}_${product.sizes[0]}_${product.colors[0]}`,
             productId: product._id,
             name: product.name,
             price: product.price,
             image: product.images[0],
             size: product.sizes[0],
             color: product.colors[0],
-            quantity: 1
+            quantity: 1,
+            maxStock: product.stock
         }));
     };
 

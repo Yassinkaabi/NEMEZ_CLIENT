@@ -135,6 +135,7 @@ const Product = () => {
 
         dispatch(
             addToCart({
+                cartItemId: `${product._id}_${selectedSize}_${selectedColor}`,
                 productId: product._id,
                 name: product.name,
                 price: product.price,
@@ -142,6 +143,7 @@ const Product = () => {
                 size: selectedSize,
                 color: selectedColor,
                 quantity,
+                maxStock: variantStock,
             })
         );
 
@@ -182,7 +184,7 @@ const Product = () => {
                     <span>Back</span>
                 </button>
 
-                <div className="breadcrumb">
+                <div className="breadcrumb" style={{ display: 'flex', alignItems: 'center' }}>
                     <Link to="/" className="breadcrumb-link">
                         <Home size={14} style={{ marginRight: 4, display: 'inline' }} />
                         Home
@@ -255,7 +257,7 @@ const Product = () => {
                     </div> */}
 
                     <div className="price-stock">
-                        <div style={{display:'flex',alignItems:'center',gap:'5px'}}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
                             <h1 className="price">{product?.price}</h1>
                             <span style={{ fontSize: '16px' }}>TND</span>
                         </div>

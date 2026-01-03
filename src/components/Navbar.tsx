@@ -147,7 +147,7 @@ const Navbar = () => {
                         <Link to="/" className="navbar-logo">
                             {/* NEMEZ */}
                             <img src="/images/logocover.PNG" alt="" width={100} />
-                            <img style={{ position: 'absolute' }} src="/images/logo.png" alt="" width={20} />
+                            {/* <img style={{ position: 'absolute' }} src="/images/logo.png" alt="" width={20} /> */}
                         </Link>
                     </div>
                     <button className="close-btn" onClick={() => setMobileMenuOpen(false)}>
@@ -158,7 +158,7 @@ const Navbar = () => {
                 </div>
 
                 <nav className="navbar-mobile-links">
-                    <Link to="/" onClick={() => setMobileMenuOpen(false)}>Accueil</Link>
+                    <Link to="/" onClick={() => setMobileMenuOpen(false)}>Accueil</Link>    
                     {categories.map((category) => (
                         <Link
                             key={category._id}

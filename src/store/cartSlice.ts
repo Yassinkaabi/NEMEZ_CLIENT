@@ -1,6 +1,7 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 
-interface CartItem {
+export interface CartItem {
+    cartItemId: string;
     productId: string;
     name: string;
     price: number;
@@ -8,6 +9,7 @@ interface CartItem {
     size: string;
     color: string;
     quantity: number;
+    maxStock: number;
 }
 
 interface CartState {
@@ -15,8 +17,8 @@ interface CartState {
 }
 
 const loadCartFromStorage = (): CartItem[] => {
-    const savedCart = localStorage.getItem('cart');
-    return savedCart ? JSON.parse(savedCart) : [];
+    const saved = localStorage.getItem('cart');
+    return saved ? JSON.parse(saved) : [];
 };
 
 const saveCartToStorage = (items: CartItem[]) => {
@@ -24,7 +26,7 @@ const saveCartToStorage = (items: CartItem[]) => {
 };
 
 const initialState: CartState = {
-    items: loadCartFromStorage()
+    items: loadCartFromStorage(),
 };
 
 const cartSlice = createSlice({
@@ -40,7 +42,10 @@ const cartSlice = createSlice({
             );
 
             if (existingItem) {
-                existingItem.quantity += action.payload.quantity;
+                existingItem.quantity = Math.min(
+                    existingItem.quantity + action.payload.quantity,
+                    existingItem.maxStock
+                );
             } else {
                 state.items.push(action.payload);
             }
@@ -48,25 +53,36 @@ const cartSlice = createSlice({
             saveCartToStorage(state.items);
         },
 
-        updateQuantity: (state, action: PayloadAction<{ productId: string; quantity: number }>) => {
-            const item = state.items.find(i => i.productId === action.payload.productId);
-            if (item) {
-                item.quantity = action.payload.quantity;
-                saveCartToStorage(state.items);
-            }
-        },
+        updateQuantity: (
+            state,
+            action: PayloadAction<{ cartItemId: string; quantity: number }>
+        ) => {
+            const item = state.items.find(i => i.cartItemId === action.payload.cartItemId);
+            if (!item) return;
 
-        removeFromCart: (state, action: PayloadAction<string>) => {
-            state.items = state.items.filter(item => item.productId !== action.payload);
+            if (action.payload.quantity > item.maxStock) {
+                item.quantity = item.maxStock;
+            } else if (action.payload.quantity < 1) {
+                item.quantity = 1;
+            } else {
+                item.quantity = action.payload.quantity;
+            }
+
             saveCartToStorage(state.items);
         },
 
-        clearCart: (state) => {
+        removeFromCart: (state, action: PayloadAction<string>) => {
+            state.items = state.items.filter(item => item.cartItemId !== action.payload);
+            saveCartToStorage(state.items);
+        },
+
+        clearCart: state => {
             state.items = [];
             localStorage.removeItem('cart');
-        }
-    }
+        },
+    },
 });
 
-export const { addToCart, updateQuantity, removeFromCart, clearCart } = cartSlice.actions;
+export const { addToCart, updateQuantity, removeFromCart, clearCart } =
+    cartSlice.actions;
 export default cartSlice.reducer;
