@@ -1,4 +1,4 @@
-import { Card, Typography, Button, Tag } from 'antd';
+import { Card, Typography, Button, Tag, Space } from 'antd';
 import { Link, useNavigate } from 'react-router-dom';
 
 const { Text } = Typography;
@@ -8,63 +8,481 @@ interface ProductCardProps {
 }
 
 const ProductCard = ({ product }: ProductCardProps) => {
-    const navigate = useNavigate()
+    const navigate = useNavigate();
     const isInStock = product.stock > 0;
 
+    const colorMap: { [key: string]: string } = {
+        'noir': '#000000',
+        'blanc': '#FFFFFF',
+        'gris': '#808080',
+        'rouge': '#ff4136',
+        'bleu': '#0074d9',
+        'vert': '#2ecc40',
+        'jaune': '#FFFF00',
+        'orange': '#FFA500',
+        'violet': '#800080',
+        'rose': '#FFC0CB',
+        'marron': '#8b4513',
+        'beige': '#F5F5DC',
+
+        // Nuances de bleu
+        'bleu marine': '#000080',
+        'bleu ciel': '#87CEEB',
+        'bleu royal': '#4169E1',
+        'turquoise': '#40E0D0',
+        'cyan': '#00FFFF',
+
+        // Nuances de rouge
+        'rouge foncé': '#8B0000',
+        'bordeaux': '#800020',
+        'rouge vif': '#FF0000',
+        'corail': '#FF7F50',
+        'rouge brique': '#B22222',
+
+        // Nuances de vert
+        'vert foncé': '#006400',
+        'vert clair': '#90EE90',
+        'vert olive': '#808000',
+        'vert menthe': '#98FF98',
+        'vert émeraude': '#50C878',
+
+        // Nuances de gris
+        'gris clair': '#D3D3D3',
+        'gris foncé': '#A9A9A9',
+        'argent': '#C0C0C0',
+        'anthracite': '#3A3A3A',
+
+        // Autres couleurs
+        'or': '#FFD700',
+        'bronze': '#CD7F32',
+        'crème': '#FFFDD0',
+        'ivoire': '#FFFFF0',
+        'kaki': '#C3B091',
+        'lavande': '#E6E6FA',
+        'magenta': '#FF00FF',
+        'navy': '#000080',
+        'pêche': '#FFE5B4',
+        'prune': '#8E4585',
+        'saumon': '#FA8072',
+        'taupe': '#483C32',
+    };
+
+    // Fonction pour convertir le nom de couleur français en code hex
+    const getColorHex = (colorName: string): string => {
+        const lowerColor = colorName.toLowerCase().trim();
+        return colorMap[lowerColor] || colorName; // Si pas trouvé, retourner la valeur originale (peut-être déjà un hex)
+    };
+
+    // Couleurs disponibles (limiter l'affichage à 4 maximum)
+    const displayColors = product.colors?.slice(0, 4) || [];
+    const hasMoreColors = product.colors?.length > 4;
+
+    // Tailles disponibles (limiter l'affichage à 5 maximum)
+    const displaySizes = product.sizes?.slice(0, 5) || [];
+    const hasMoreSizes = product.sizes?.length > 5;
+
     return (
-        <Link to={`/product/${encodeURIComponent(product.name)}`}>
+        <Link to={`/product/${encodeURIComponent(product.name)}`} className="product-card-link">
             <Card
                 hoverable
                 cover={
-                    <div style={{ position: 'relative', overflow: 'hidden' }}>
+                    <div className="product-image-container">
                         <img
                             alt={product.name}
                             src={product.images[0]}
+                            className="product-image"
                             style={{
-                                height: 280,
-                                width: '100%',
-                                objectFit: 'cover',
                                 filter: !isInStock ? 'grayscale(50%) opacity(0.7)' : 'none'
                             }}
                         />
                         <Tag
                             color={isInStock ? 'success' : 'error'}
-                            style={{
-                                position: 'absolute',
-                                top: 12,
-                                left: 12,
-                                fontSize: '12px',
-                                fontWeight: 600,
-                                padding: '4px 12px',
-                                border: 'none',
-                                boxShadow: '0 2px 8px rgba(0,0,0,0.15)'
-                            }}
+                            className="stock-badge"
                         >
                             {isInStock ? 'En Stock' : 'Hors Stock'}
                         </Tag>
                     </div>
                 }
                 styles={{ body: { padding: 16 } }}
-                style={{ borderRadius: 8, border: '1px solid #e8e8e8' }}
+                className="product-card"
             >
-                <Text strong style={{ fontSize: 16, display: 'block', marginBottom: 8 }}>
+                <h3 className="product-name">
                     {product.name}
-                </Text>
+                </h3>
 
-                <Text style={{ fontSize: 18, color: '#E53935', fontWeight: 600 }}>
+                {/* Couleurs disponibles */}
+                {displayColors.length > 0 && (
+                    <div className="product-colors">
+                        <Space size={4} wrap>
+                            {displayColors.map((color: string, index: number) => {
+                                const hexColor = getColorHex(color);
+                                const isLightColor = ['#FFFFFF', '#FFFFF0', '#FFFDD0', '#F5F5DC'].includes(hexColor.toUpperCase());
+
+                                return (
+                                    <div
+                                        key={index}
+                                        className="color-dot"
+                                        style={{
+                                            backgroundColor: hexColor,
+                                            border: isLightColor ? '1px solid #d9d9d9' : 'none'
+                                        }}
+                                        title={color}
+                                    />
+                                );
+                            })}
+                            {hasMoreColors && (
+                                <Text className="more-indicator">+{product.colors.length - 4}</Text>
+                            )}
+                        </Space>
+                    </div>
+                )}
+
+                {/* Tailles disponibles */}
+                {displaySizes.length > 0 && (
+                    <div className="product-sizes">
+                        <Space size={4} wrap>
+                            {displaySizes.map((size: string, index: number) => (
+                                <span key={index} className="size-tag">
+                                    {size}
+                                </span>
+                            ))}
+                            {hasMoreSizes && (
+                                <Text className="more-indicator">+{product.sizes.length - 5}</Text>
+                            )}
+                        </Space>
+                    </div>
+                )}
+
+                <Text className="product-price">
                     {product.price} TND
                 </Text>
 
                 <Button
                     type="primary"
                     block
-                    style={{ marginTop: 12 }}
-                    onClick={() => navigate(`/product/${product.name}`)}
+                    className="product-button"
+                    onClick={(e) => {
+                        e.preventDefault();
+                        navigate(`/product/${product.name}`);
+                    }}
                     disabled={!isInStock}
                 >
-                    Voir en détail
+                    <span className="button-text">Voir les détails</span>
+                    <span className="button-icon">→</span>
                 </Button>
             </Card>
+
+            <style>{`
+                .product-card-link {
+                    display: block;
+                    height: 100%;
+                }
+                
+                .product-card {
+                    height: 100%;
+                    display: flex;
+                    flex-direction: column;
+                    border-radius: 8px;
+                    border: 1px solid #e8e8e8;
+                    transition: all 0.3s ease;
+                }
+                
+                .product-card:hover {
+                    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+                    transform: translateY(-2px);
+                }
+                
+                .product-image-container {
+                    position: relative;
+                    overflow: hidden;
+                    background: #f5f5f5;
+                }
+                
+                .product-image {
+                    height: 280px;
+                    width: 100%;
+                    object-fit: cover;
+                    transition: transform 0.3s ease;
+                }
+                
+                .product-card:hover .product-image {
+                    transform: scale(1.05);
+                }
+                
+                .stock-badge {
+                    position: absolute;
+                    top: 12px;
+                    left: 12px;
+                    fontSize: 12px;
+                    fontWeight: 600;
+                    padding: 4px 12px;
+                    border: none;
+                    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+                    z-index: 1;
+                }
+                
+                .product-name {
+                    font-size: 19px;
+                    display: block;
+                    // margin-bottom: 8px;
+                    line-height: 1.4;
+                    height: 44px;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    display: -webkit-box;
+                    -webkit-line-clamp: 2;
+                    -webkit-box-orient: vertical;
+                }
+                
+                .product-colors {
+                    margin-bottom: 8px;
+                    min-height: 20px;
+                }
+                
+                .color-dot {
+                    width: 20px;
+                    height: 20px;
+                    border-radius: 50%;
+                    display: inline-block;
+                    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+                    cursor: pointer;
+                    transition: transform 0.2s ease;
+                }
+                
+                .color-dot:hover {
+                    transform: scale(1.2);
+                }
+                
+                .product-sizes {
+                    margin-bottom: 8px;
+                    min-height: 22px;
+                }
+                
+                .size-tag {
+                    display: inline-block;
+                    padding: 2px 8px;
+                    background: #f0f0f0;
+                    border: 1px solid #d9d9d9;
+                    border-radius: 4px;
+                    font-size: 11px;
+                    font-weight: 500;
+                    color: #595959;
+                    line-height: 1.4;
+                }
+                
+                .more-indicator {
+                    font-size: 11px;
+                    color: #8c8c8c;
+                    font-weight: 500;
+                }
+                
+                .product-price {
+                    font-size: 18px;
+                    color: #000000c4;
+                    font-weight: 600;
+                    display: block;
+                    margin-bottom: 12px;
+                    margin-top: 8px;
+                }
+                
+                .product-button {
+                    margin-top: auto;
+                    height: 40px;
+                    font-weight: 600;
+                    border-radius: 8px;
+                    border: none;
+                    background: linear-gradient(135deg, #b1b3b8ff 0%, #4b4a4bff 100%);
+                    position: relative;
+                    overflow: hidden;   
+                    transition: all 0.3s ease;
+                    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+                }
+                
+                .product-button:hover:not(:disabled) {
+                    transform: translateY(-2px);
+                    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+                    background: linear-gradient(135deg, #4b4a4bff 0%, #b1b3b8ff 100%) !important;
+                }
+                
+                .product-button:disabled {
+                    background: #d9d9d9;
+                    box-shadow: none;
+                    cursor: not-allowed;
+                }
+                
+                .product-button .button-text {
+                    display: inline-block;
+                    transition: transform 0.3s ease;
+                }
+                
+                .product-button .button-icon {
+                    display: inline-block;
+                    margin-left: 6px;
+                    transition: transform 0.3s ease;
+                    font-size: 16px;
+                    font-weight: bold;
+                }
+                
+                .product-button:hover:not(:disabled) .button-text {
+                    transform: translateX(-3px);
+                }
+                
+                .product-button:hover:not(:disabled) .button-icon {
+                    transform: translateX(3px);
+                }
+                
+                .product-button::before {
+                    content: '';
+                    position: absolute;
+                    top: 0;
+                    left: -100%;
+                    width: 100%;
+                    height: 100%;
+                    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+                    transition: left 0.5s ease;
+                }
+                
+                .product-button:hover:not(:disabled)::before {
+                    left: 100%;
+                }
+
+                /* Tablet */
+                @media (max-width: 991px) {
+                    .product-image {
+                        height: 240px;
+                    }
+                    .product-name {
+                        font-size: 15px;
+                    }
+                    .product-price {
+                        font-size: 17px;
+                    }
+                }
+
+                /* Mobile - 2 colonnes */
+                @media (max-width: 767px) {
+                    .product-card {
+                        border-radius: 6px;
+                    }
+                    
+                    .product-image {
+                        height: 180px;
+                    }
+                    
+                    .stock-badge {
+                        top: 8px;
+                        left: 8px;
+                        font-size: 10px;
+                        padding: 3px 8px;
+                    }
+                    
+                    .product-name {
+                        font-size: 13px;
+                        margin-bottom: 6px;
+                        height: 36px;
+                    }
+                    
+                    .product-colors {
+                        margin-bottom: 6px;
+                        min-height: 16px;
+                    }
+                    
+                    .color-dot {
+                        width: 16px;
+                        height: 16px;
+                    }
+                    
+                    .product-sizes {
+                        margin-bottom: 6px;
+                        min-height: 18px;
+                    }
+                    
+                    .size-tag {
+                        padding: 1px 6px;
+                        font-size: 10px;
+                        border-radius: 3px;
+                    }
+                    
+                    .more-indicator {
+                        font-size: 10px;
+                    }
+                    
+                    .product-price {
+                        font-size: 15px;
+                        margin-bottom: 10px;
+                        margin-top: 6px;
+                    }
+                    
+                    .product-button {
+                        height: 36px;
+                        font-size: 13px;
+                    }
+                    
+                    .ant-card-body {
+                        padding: 12px !important;
+                    }
+                }
+
+                /* Très petits écrans */
+                @media (max-width: 479px) {
+                    .product-image {
+                        height: 160px;
+                    }
+                    
+                    .stock-badge {
+                        top: 6px;
+                        left: 6px;
+                        font-size: 9px;
+                        padding: 2px 6px;
+                    }
+                    
+                    .product-name {
+                        font-size: 12px;
+                        height: 32px;
+                        margin-bottom: 4px;
+                    }
+                    
+                    .product-colors {
+                        margin-bottom: 5px;
+                        min-height: 14px;
+                    }
+                    
+                    .color-dot {
+                        width: 14px;
+                        height: 14px;
+                    }
+                    
+                    .product-sizes {
+                        margin-bottom: 5px;
+                        min-height: 16px;
+                    }
+                    
+                    .size-tag {
+                        padding: 1px 5px;
+                        font-size: 9px;
+                        border-radius: 2px;
+                    }
+                    
+                    .more-indicator {
+                        font-size: 9px;
+                    }
+                    
+                    .product-price {
+                        font-size: 14px;
+                        margin-bottom: 8px;
+                        margin-top: 5px;
+                    }
+                    
+                    .product-button {
+                        height: 32px;
+                        font-size: 12px;
+                    }
+                    
+                    .ant-card-body {
+                        padding: 10px !important;
+                    }
+                }
+            `}</style>
         </Link>
     );
 };

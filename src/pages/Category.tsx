@@ -38,7 +38,7 @@ const Category = () => {
     const pagination = data?.data?.pagination || {};
 
     const sizeOptions = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
-    const colorOptions = ['Noir', 'Blanc', 'Bleu', 'Gris', 'Rouge', 'Vert'];
+    const colorOptions = ['noir', 'blanc', 'bleu', 'gris', 'rouge', 'vert'];
 
     const handleSizeChange = (checkedValues: any) => {
         setFilters({ ...filters, sizes: checkedValues });
