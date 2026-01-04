@@ -73,8 +73,8 @@
 .section-title {
     text-align: center;
     margin-bottom: 48px !important;
-    font-size: 36px !important;
-    color: #1890ff;
+    font-size: 56px !important;
+    /* color: #1890ff; */
 }
 
 .upcoming-product-card {

@@ -1,7 +1,7 @@
-import { Form, Input, Button, Card, Typography, message, Spin } from 'antd';
+import { Form, Input, Button, Card, Typography, message } from 'antd';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../store/redux';
-import { loginUser } from '../store/authSlice';
+import { loginUser, clearError } from '../store/authSlice';
 import type { RootState } from '../store';
 import { useEffect } from 'react';
 
@@ -12,42 +12,33 @@ const Login = () => {
     const dispatch = useAppDispatch();
     const [form] = Form.useForm();
 
-    const { user, isLoading } = useAppSelector((state: RootState) => state.auth);
-    const token = localStorage.getItem('accessToken');
+    const { user, isLoading, isAuthenticated } = useAppSelector((state: RootState) => state.auth);
 
     useEffect(() => {
-        if (token && user) {
+        if (isAuthenticated && user) {
             navigate('/', { replace: true });
         }
-    }, [token, user, navigate]);
+    }, [isAuthenticated, user, navigate]);
 
-    if (isLoading) {
-        return (
-            <div style={{
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                minHeight: '100vh'
-            }}>
-                <Spin size="large" />
-            </div>
-        );
-    }
+    useEffect(() => {
+        dispatch(clearError());
+    }, [dispatch]);
 
     const handleSubmit = async (values: { email: string; password: string }) => {
-        try {
-            await dispatch(loginUser({ 
-                email: values.email, 
-                password: values.password 
-            })).unwrap();
-            
+        const resultAction = await dispatch(loginUser({
+            email: values.email,
+            password: values.password
+        }));
+
+        // Vérifier si l'action a réussi
+        if (loginUser.fulfilled.match(resultAction)) {
             message.success('Connexion réussie ! Bienvenue !');
-            navigate('/', { replace: true });
-        } catch (error: any) {
-            const errorMsg = error || 'Email ou mot de passe incorrect';
-            message.error(errorMsg);
+            navigate("/")
+        } else {
+            // Erreur - ne pas naviguer
+            const errorMsg = resultAction.payload as string || 'Email ou mot de passe incorrect';
+            // message.error(errorMsg);
             form.setFields([
-                { name: 'email', errors: [] },
                 { name: 'password', errors: [errorMsg] }
             ]);
         }

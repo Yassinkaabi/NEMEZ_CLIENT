@@ -156,14 +156,6 @@ const Cart = () => {
                     <div className="cart-mobile-list">
                         {cartItems.map((item, index) => {
                             const isMax = item.quantity >= item.maxStock;
-                            console.log(
-                                cartItems.map(item => ({
-                                    cartItemId: item.cartItemId,
-                                    productId: item.productId,
-                                    size: item.size,
-                                    color: item.color,
-                                }))
-                            );
                             return (
                                 <div key={`${item.cartItemId}-${index}`} className="cart-item-card">
                                     <div className="cart-item-header">

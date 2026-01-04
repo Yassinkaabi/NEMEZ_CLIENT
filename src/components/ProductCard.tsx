@@ -1,8 +1,5 @@
 import { Card, Typography, Button, Tag } from 'antd';
-import { ShoppingCartOutlined } from '@ant-design/icons';
-import { Link } from 'react-router-dom';
-import { addToCart } from '../store/cartSlice';
-import { useAppDispatch } from '../store/redux';
+import { Link, useNavigate } from 'react-router-dom';
 
 const { Text } = Typography;
 
@@ -11,27 +8,8 @@ interface ProductCardProps {
 }
 
 const ProductCard = ({ product }: ProductCardProps) => {
-    const dispatch = useAppDispatch();
+    const navigate = useNavigate()
     const isInStock = product.stock > 0;
-
-    const handleAddToCart = (e: React.MouseEvent) => {
-        e.preventDefault();
-        e.stopPropagation();
-
-        if (!isInStock) return;
-
-        dispatch(addToCart({
-            cartItemId: `${product._id}_${product.sizes[0]}_${product.colors[0]}`,
-            productId: product._id,
-            name: product.name,
-            price: product.price,
-            image: product.images[0],
-            size: product.sizes[0],
-            color: product.colors[0],
-            quantity: 1,
-            maxStock: product.stock
-        }));
-    };
 
     return (
         <Link to={`/product/${encodeURIComponent(product.name)}`}>
@@ -66,7 +44,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
                         </Tag>
                     </div>
                 }
-                bodyStyle={{ padding: 16 }}
+                styles={{ body: { padding: 16 } }}
                 style={{ borderRadius: 8, border: '1px solid #e8e8e8' }}
             >
                 <Text strong style={{ fontSize: 16, display: 'block', marginBottom: 8 }}>
@@ -79,13 +57,12 @@ const ProductCard = ({ product }: ProductCardProps) => {
 
                 <Button
                     type="primary"
-                    icon={<ShoppingCartOutlined />}
                     block
                     style={{ marginTop: 12 }}
-                    onClick={handleAddToCart}
+                    onClick={() => navigate(`/product/${product.name}`)}
                     disabled={!isInStock}
                 >
-                    {isInStock ? 'Ajouter au panier' : 'Indisponible'}
+                    Voir en détail
                 </Button>
             </Card>
         </Link>

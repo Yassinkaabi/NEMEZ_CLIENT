@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../store/redux";
 import type { RootState } from "../store";
@@ -12,25 +12,40 @@ const Navbar = () => {
     const { user } = useAppSelector((state: RootState) => state.auth);
     const cartItems = useAppSelector((state: any) => state.cart.items || []);
     const { categories } = useAppSelector((state: RootState) => state.categories);
-    // const [searchValue, setSearchValue] = useState("");
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+    const [userDropdownOpen, setUserDropdownOpen] = useState(false);
+    const dropdownRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         dispatch(fetchCategories());
     }, [dispatch]);
 
-    // const handleSearch = (e: React.FormEvent) => {
-    //     e.preventDefault();
-    //     if (searchValue.trim()) {
-    //         navigate(`/search?q=${searchValue.trim()}`);
-    //         setSearchValue("");
-    //         setMobileMenuOpen(false);
-    //     }
-    // };
+    // Close dropdown when clicking outside
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+                setUserDropdownOpen(false);
+            }
+        };
+
+        if (userDropdownOpen) {
+            document.addEventListener("mousedown", handleClickOutside);
+        }
+
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, [userDropdownOpen]);
 
     const handleLogout = () => {
         dispatch(logout());
         navigate("/login");
+        setMobileMenuOpen(false);
+        setUserDropdownOpen(false);
+    };
+
+    const handleDropdownLinkClick = () => {
+        setUserDropdownOpen(false);
         setMobileMenuOpen(false);
     };
 
@@ -41,12 +56,9 @@ const Navbar = () => {
                 <div className="navbar-container">
 
                     {/* Logo */}
-                    {/* <div style={{ position: 'relative' }}> */}
                     <Link to="/" className="navbar-logo">
                         <img src="/images/logocover.PNG" alt="" width={100} />
                     </Link>
-                    {/* <img style={{ position: 'absolute' }} src="/images/logo.png" alt="" width={20} /> */}
-                    {/* </div> */}
 
                     {/* Menu Desktop */}
                     <nav className="navbar-menu-desktop">
@@ -61,22 +73,6 @@ const Navbar = () => {
 
                     {/* Actions à droite */}
                     <div className="navbar-actions">
-
-                        {/* Recherche Desktop */}
-                        {/* <form onSubmit={handleSearch} className="navbar-search-desktop">
-                            <input
-                                type="text"
-                                placeholder="Rechercher un produit..."
-                                value={searchValue}
-                                onChange={(e) => setSearchValue(e.target.value)}
-                            />
-                            <button type="submit">
-                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                    <circle cx="11" cy="11" r="8" />
-                                    <path d="m21 21-4.35-4.35" />
-                                </svg>
-                            </button>
-                        </form> */}
 
                         {/* Panier */}
                         <button
@@ -96,30 +92,38 @@ const Navbar = () => {
                         </button>
 
                         {/* Menu utilisateur */}
-                        <div className="navbar-user-menu">
-                            <button className="navbar-icon-btn">
+                        <div className="navbar-user-menu" ref={dropdownRef}>
+                            <button
+                                className="navbar-icon-btn"
+                                onClick={() => setUserDropdownOpen(!userDropdownOpen)}
+                            >
                                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                                     <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
                                     <circle cx="12" cy="7" r="4" />
                                 </svg>
                             </button>
 
-                            <div className="navbar-dropdown">
+                            <div className={`navbar-dropdown ${userDropdownOpen ? "open" : ""}`}>
                                 {user ? (
                                     <>
-                                        <Link to="/account" onClick={() => setMobileMenuOpen(false)}>
+                                        <Link to="/account" onClick={handleDropdownLinkClick}>
                                             Mon compte
                                         </Link>
+                                        {user.role === "admin" && (
+                                            <Link to="/admin" onClick={handleDropdownLinkClick}>
+                                                Admin panel
+                                            </Link>
+                                        )}
                                         <button onClick={handleLogout} className="navbar-dropdown-item">
                                             Déconnexion
                                         </button>
                                     </>
                                 ) : (
                                     <>
-                                        <Link to="/login" onClick={() => setMobileMenuOpen(false)}>
+                                        <Link to="/login" onClick={handleDropdownLinkClick}>
                                             Connexion
                                         </Link>
-                                        <Link to="/signup" onClick={() => setMobileMenuOpen(false)}>
+                                        <Link to="/signup" onClick={handleDropdownLinkClick}>
                                             Inscription
                                         </Link>
                                     </>
@@ -145,9 +149,7 @@ const Navbar = () => {
                 <div className="navbar-mobile-header">
                     <div style={{ position: 'relative' }}>
                         <Link to="/" className="navbar-logo">
-                            {/* NEMEZ */}
                             <img src="/images/logocover.PNG" alt="" width={100} />
-                            {/* <img style={{ position: 'absolute' }} src="/images/logo.png" alt="" width={20} /> */}
                         </Link>
                     </div>
                     <button className="close-btn" onClick={() => setMobileMenuOpen(false)}>
@@ -158,7 +160,7 @@ const Navbar = () => {
                 </div>
 
                 <nav className="navbar-mobile-links">
-                    <Link to="/" onClick={() => setMobileMenuOpen(false)}>Accueil</Link>    
+                    <Link to="/" onClick={() => setMobileMenuOpen(false)}>Accueil</Link>
                     {categories.map((category) => (
                         <Link
                             key={category._id}
@@ -170,21 +172,6 @@ const Navbar = () => {
                     ))}
                     <Link to="/news" onClick={() => setMobileMenuOpen(false)}>News</Link>
                 </nav>
-
-                {/* <form onSubmit={handleSearch} className="navbar-mobile-search">
-                    <input
-                        type="text"
-                        placeholder="Rechercher..."
-                        value={searchValue}
-                        onChange={(e) => setSearchValue(e.target.value)}
-                    />
-                    <button type="submit">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                            <circle cx="11" cy="11" r="8" />
-                            <path d="m21 21-4.35-4.35" />
-                        </svg>
-                    </button>
-                </form> */}
 
                 <div className="navbar-mobile-user">
                     {user ? (

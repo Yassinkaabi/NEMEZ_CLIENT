@@ -24,7 +24,21 @@ api.interceptors.response.use(
     async (error) => {
         const originalRequest = error.config;
 
-        if (error.response?.status === 401 && !originalRequest._retry) {
+        // Ne pas tenter de refresh pour les routes d'authentification
+        const isAuthRoute = originalRequest.url?.includes('/auth/login') || 
+                           originalRequest.url?.includes('/auth/signup') ||
+                           originalRequest.url?.includes('/auth/refresh');
+
+        // Seulement rafraîchir si :
+        // 1. C'est une erreur 401
+        // 2. Ce n'est pas une route d'authentification
+        // 3. On n'a pas déjà essayé de rafraîchir
+        // 4. Un refreshToken existe
+        if (error.response?.status === 401 && 
+            !isAuthRoute && 
+            !originalRequest._retry && 
+            localStorage.getItem('refreshToken')) {
+            
             originalRequest._retry = true;
 
             try {
@@ -37,6 +51,7 @@ api.interceptors.response.use(
                 originalRequest.headers.Authorization = `Bearer ${accessToken}`;
                 return api(originalRequest);
             } catch (refreshError) {
+                // Le refresh a échoué, nettoyer et rediriger
                 localStorage.removeItem('accessToken');
                 localStorage.removeItem('refreshToken');
                 window.location.href = '/login';
@@ -44,6 +59,7 @@ api.interceptors.response.use(
             }
         }
 
+        // Pour toutes les autres erreurs (y compris login/signup échoués)
         return Promise.reject(error);
     }
 );

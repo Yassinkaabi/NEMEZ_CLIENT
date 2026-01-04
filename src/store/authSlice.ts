@@ -100,6 +100,7 @@ const authSlice = createSlice({
             state.user = null;
             state.isAuthenticated = false;
             state.error = null;
+            state.isLoading = false;
         },
         clearError: (state) => {
             state.error = null;
@@ -116,6 +117,7 @@ const authSlice = createSlice({
                 state.isLoading = false;
                 state.user = action.payload;
                 state.isAuthenticated = true;
+                state.error = null;
             })
             .addCase(loadUserProfile.rejected, (state, action) => {
                 state.isLoading = false;
@@ -132,11 +134,13 @@ const authSlice = createSlice({
                 state.isLoading = false;
                 state.user = action.payload;
                 state.isAuthenticated = true;
+                state.error = null;
             })
             .addCase(loginUser.rejected, (state, action) => {
                 state.isLoading = false;
                 state.error = action.payload as string;
                 state.isAuthenticated = false;
+                state.user = null;
             })
             // signupUser
             .addCase(signupUser.pending, (state) => {
@@ -147,11 +151,13 @@ const authSlice = createSlice({
                 state.isLoading = false;
                 state.user = action.payload;
                 state.isAuthenticated = true;
+                state.error = null;
             })
             .addCase(signupUser.rejected, (state, action) => {
                 state.isLoading = false;
                 state.error = action.payload as string;
                 state.isAuthenticated = false;
+                state.user = null;
             });
     },
 });

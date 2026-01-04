@@ -1,46 +1,45 @@
-import React, { useEffect, useState } from 'react';
-import { Card, Row, Col, Statistic, Typography, Space, Spin } from 'antd';
-import { ClockCircleOutlined, FireOutlined, TagOutlined } from '@ant-design/icons';
-import axios from 'axios';
+import React from 'react';
+import { Row, Typography } from 'antd';
+import { FireOutlined } from '@ant-design/icons';
+// import axios from 'axios';
 import AdvertisementCarousel from '../components/AdvertisementCarousel';
 import '../styles/NewsPage.css';
 
-const { Title, Paragraph, Text } = Typography;
-const { Countdown } = Statistic;
+const { Title, Paragraph } = Typography;
 
-interface UpcomingProduct {
-    _id: string;
-    name: string;
-    description: string;
-    price: number;
-    imageUrl: string;
-    launchDate: string;
-}
+// interface UpcomingProduct {
+//     _id: string;
+//     name: string;
+//     description: string;
+//     price: number;
+//     imageUrl: string;
+//     launchDate: string;
+// }
 
 const NewsPage: React.FC = () => {
-    const [upcomingProduct, setUpcomingProduct] = useState<UpcomingProduct | null>(null);
-    const [loading, setLoading] = useState(true);
+    // const [upcomingProduct, setUpcomingProduct] = useState<UpcomingProduct | null>(null);
+    // const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        fetchUpcomingProduct();
-    }, []);
+    // useEffect(() => {
+    //     fetchUpcomingProduct();
+    // }, []);
 
-    const fetchUpcomingProduct = async () => {
-        try {
-            const response = await axios.get(`${import.meta.env.VITE_API_URL}/products/upcoming`);
-            setUpcomingProduct(response.data.data);
-            setLoading(false);
-        } catch (error) {
-            console.error('Erreur chargement produit à venir:', error);
-            setLoading(false);
-        }
-    };
+    // const fetchUpcomingProduct = async () => {
+    //     try {
+    //         const response = await axios.get(`${import.meta.env.VITE_API_URL}/products/upcoming`);
+    //         setUpcomingProduct(response.data.data);
+    //         setLoading(false);
+    //     } catch (error) {
+    //         console.error('Erreur chargement produit à venir:', error);
+    //         setLoading(false);
+    //     }
+    // };
 
-    const onCountdownFinish = () => {
-        console.log('Le produit est maintenant disponible!');
-        // Recharger les données ou rediriger
-        fetchUpcomingProduct();
-    };
+    // const onCountdownFinish = () => {
+    //     console.log('Le produit est maintenant disponible!');
+    //     // Recharger les données ou rediriger
+    //     fetchUpcomingProduct();
+    // };
 
     return (
         <div className="news-page">
@@ -64,7 +63,7 @@ const NewsPage: React.FC = () => {
             </div>
 
             {/* Upcoming Product Section with Countdown */}
-            {loading ? (
+            {/* {loading ? (
                 <div className="loading-container">
                     <Spin size="large" />
                 </div>
@@ -131,16 +130,16 @@ const NewsPage: React.FC = () => {
                         </Card>
                     </div>
                 </div>
-            ) : null}
+            ) : null} */}
 
             {/* Additional News Section */}
             <div className="news-grid-section">
                 <div className="container">
-                    <Title level={2} className="section-title">
-                        Actualités
-                    </Title>
+                    <h1 className="section-title">
+                        Comming Soon...
+                    </h1>
                     <Row gutter={[24, 24]}>
-                        <Col xs={24} sm={12} md={8}>
+                        {/* <Col xs={24} sm={12} md={8}>
                             <Card
                                 hoverable
                                 cover={<div className="news-card-image" style={{ backgroundColor: '#f0f2f5' }}></div>}
@@ -172,7 +171,7 @@ const NewsPage: React.FC = () => {
                                     description="Nos conseils pour créer les meilleures combinaisons de looks."
                                 />
                             </Card>
-                        </Col>
+                        </Col> */}
                     </Row>
                 </div>
             </div>

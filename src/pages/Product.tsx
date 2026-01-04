@@ -9,6 +9,7 @@ import { addToCart } from '../store/cartSlice';
 import { useAppDispatch, useAppSelector } from '../store/redux';
 import ReviewList from '../components/ReviewList';
 import type { RootState } from '../store';
+import { Typography } from 'antd';
 
 const COLOR_NAME_TO_HEX: Record<string, string> = {
     black: '#000000', noir: '#000000',
@@ -21,6 +22,8 @@ const COLOR_NAME_TO_HEX: Record<string, string> = {
     pink: '#ff69b4', rose: '#ff69b4',
     brown: '#8b4513', marron: '#8b4513',
 };
+
+const { Title } = Typography;
 
 interface ColorItem {
     name: string;
@@ -50,16 +53,8 @@ const Product = () => {
         queryFn: () => api.get(`/products/name/${slug}`),
     });
 
-    const { data: categoryData } = useQuery({
-        queryKey: ['category', data?.data?.product?.category],
-        queryFn: () => api.get(`/categories/${data?.data?.product?.category}`),
-        enabled: !!data?.data?.product?.category,
-    });
-
     const user = useAppSelector((state: RootState) => state.auth.user);
     const product = data?.data?.product;
-    // const reviewStats = data?.data?.reviewStats;
-    const category = categoryData?.data?.category;
 
     const selectedVariant = product?.variants?.find(
         (v: Variant) => v.size === selectedSize && v.color === selectedColor
@@ -190,9 +185,9 @@ const Product = () => {
                         Home
                     </Link>
                     <span className="breadcrumb-separator">›</span>
-                    {category ? (
-                        <Link to={`/category/${category._id}`} className="breadcrumb-link">
-                            {category.name}
+                    {product ? (
+                        <Link to={`/category/${product.categoryId._id}`} className="breadcrumb-link">
+                            {product.categoryId.name}
                         </Link>
                     ) : (
                         <span className="breadcrumb-link">Category</span>
@@ -245,8 +240,9 @@ const Product = () => {
 
                 {/* Product Info */}
                 <div className="product-info">
-                    <h1 className="product-title">{product?.name}</h1>
-
+                    <Title level={1} style={{ margin: '0 0 16px', fontWeight: 500 }}>
+                        {product?.name}
+                    </Title>
                     {/* <div className="rating-container">
                         <div className="stars">
                             {renderStars(reviewStats?.averageRating || 0)}
@@ -258,8 +254,9 @@ const Product = () => {
 
                     <div className="price-stock">
                         <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-                            <h1 className="price">{product?.price}</h1>
-                            <span style={{ fontSize: '16px' }}>TND</span>
+                            <Title level={2} style={{ margin: 0 }}>
+                                {product?.price} TND
+                            </Title>
                         </div>
                         <span className={`stock-badge ${isInStock ? 'stock-badge--in-stock' : 'stock-badge--out-of-stock'}`}>
                             {isInStock ? <Check size={14} /> : <X size={14} />}

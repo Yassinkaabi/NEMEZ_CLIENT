@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { Table, Button, Input, Modal, Form, InputNumber, Select, message, Popconfirm, Tag, Card, Row, Col } from 'antd';
-import { EditOutlined, DeleteOutlined, PlusOutlined, SearchOutlined } from '@ant-design/icons';
+import { Table, Button, Input, Modal, Form, InputNumber, Select, message, Popconfirm, Tag, Card, Row, Col, Upload } from 'antd';
+import { EditOutlined, DeleteOutlined, PlusOutlined, SearchOutlined, UploadOutlined, CloseCircleOutlined } from '@ant-design/icons';
 import AdminLayout from '../../components/admin/AdminLayout';
 import * as adminService from '../../services/adminService';
 import '../../styles/admin.css';
@@ -34,6 +34,8 @@ const AdminProducts = () => {
     const [tempSizes, setTempSizes] = useState<string[]>([]);
     const [tempColors, setTempColors] = useState<string[]>([]);
     const [variants, setVariants] = useState<Variant[]>([]);
+    const [uploadedImages, setUploadedImages] = useState<string[]>([]);
+    const [uploadingImages, setUploadingImages] = useState(false);
 
     useEffect(() => {
         fetchProducts();
@@ -75,6 +77,7 @@ const AdminProducts = () => {
         setEditingProduct(null);
         form.resetFields();
         setVariants([]);
+        setUploadedImages([]);
         setIsModalOpen(true);
     };
 
@@ -85,10 +88,10 @@ const AdminProducts = () => {
             description: product.description,
             price: product.price,
             categoryId: product.categoryId._id,
-            images: product.images.join(', '),
             sizes: product.sizes,
             colors: product.colors,
         });
+        setUploadedImages(product.images || []);
         setVariants(product.variants || []);
         setIsModalOpen(true);
     };
@@ -103,7 +106,28 @@ const AdminProducts = () => {
         }
     };
 
+    const handleImageUpload = async (file: File) => {
+        try {
+            setUploadingImages(true);
+            const url = await adminService.uploadImage(file);
+            setUploadedImages(prev => [...prev, url]);
+            message.success('Image uploaded successfully');
+        } catch (error) {
+            message.error('Failed to upload image');
+        } finally {
+            setUploadingImages(false);
+        }
+    };
+
+    const handleRemoveImage = (index: number) => {
+        setUploadedImages(prev => prev.filter((_, i) => i !== index));
+    };
+
     const handleBasicInfoSubmit = (values: any) => {
+        if (uploadedImages.length === 0) {
+            message.error('Please upload at least one image');
+            return;
+        }
         const sizes = values.sizes;
         const colors = values.colors;
 
@@ -162,7 +186,7 @@ const AdminProducts = () => {
             const formValues = form.getFieldsValue();
             const productData = {
                 ...formValues,
-                images: formValues.images.split(',').map((img: string) => img.trim()),
+                images: uploadedImages,
                 sizes: tempSizes,
                 colors: tempColors,
                 variants: updatedVariants,
@@ -315,6 +339,7 @@ const AdminProducts = () => {
                         form.resetFields();
                         setEditingProduct(null);
                         setVariants([]);
+                        setUploadedImages([]);
                     }}
                     footer={null}
                     className="admin-modal"
@@ -360,11 +385,49 @@ const AdminProducts = () => {
                         </Form.Item>
 
                         <Form.Item
-                            name="images"
-                            label="Images (comma-separated URLs)"
-                            rules={[{ required: true, message: 'Please enter image URLs' }]}
+                            label="Product Images"
+                            required
                         >
-                            <Input.TextArea rows={2} placeholder="https://example.com/image1.jpg, https://example.com/image2.jpg" />
+                            <div style={{ marginBottom: 16 }}>
+                                <Upload
+                                    accept="image/*"
+                                    showUploadList={false}
+                                    beforeUpload={(file) => {
+                                        handleImageUpload(file);
+                                        return false;
+                                    }}
+                                    disabled={uploadingImages}
+                                >
+                                    <Button
+                                        icon={<UploadOutlined />}
+                                        loading={uploadingImages}
+                                        disabled={uploadingImages}
+                                    >
+                                        {uploadingImages ? 'Uploading...' : 'Upload Image'}
+                                    </Button>
+                                </Upload>
+                            </div>
+                            {uploadedImages.length > 0 && (
+                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: 8 }}>
+                                    {uploadedImages.map((url, index) => (
+                                        <div key={index} style={{ position: 'relative', paddingTop: '100%', borderRadius: 8, overflow: 'hidden', border: '1px solid #d9d9d9' }}>
+                                            <img
+                                                src={url}
+                                                alt={`Product ${index + 1}`}
+                                                style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover' }}
+                                            />
+                                            <Button
+                                                type="primary"
+                                                danger
+                                                size="small"
+                                                icon={<CloseCircleOutlined />}
+                                                onClick={() => handleRemoveImage(index)}
+                                                style={{ position: 'absolute', top: 4, right: 4 }}
+                                            />
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
                         </Form.Item>
 
                         <Form.Item
