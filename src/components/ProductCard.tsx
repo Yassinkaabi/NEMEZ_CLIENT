@@ -67,11 +67,17 @@ const ProductCard = ({ product }: ProductCardProps) => {
         'taupe': '#483C32',
     };
 
-    // Fonction pour convertir le nom de couleur français en code hex
-    const getColorHex = (colorName: string): string => {
-        const lowerColor = colorName.toLowerCase().trim();
-        return colorMap[lowerColor] || colorName; // Si pas trouvé, retourner la valeur originale (peut-être déjà un hex)
+    const getColorHex = (color: any): string => {
+        if (!color) return '#000000';
+
+        if (typeof color === 'object' && color.name) {
+            const lower = String(color.name).toLowerCase().trim();
+            return colorMap[lower] || color.name;
+        }
+
+        return '#000000';
     };
+
 
     // Couleurs disponibles (limiter l'affichage à 4 maximum)
     const displayColors = product.colors?.slice(0, 4) || [];
