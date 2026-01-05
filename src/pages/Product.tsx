@@ -21,6 +21,7 @@ const COLOR_NAME_TO_HEX: Record<string, string> = {
     green: '#2ecc40', vert: '#2ecc40',
     pink: '#ff69b4', rose: '#ff69b4',
     brown: '#8b4513', marron: '#8b4513',
+    orange: '#ffa500', jaune: '#f1c40f',
 };
 
 const { Title } = Typography;
@@ -66,6 +67,16 @@ const Product = () => {
 
     const normalizedColors: ColorItem[] = Array.isArray(product?.colors)
         ? product.colors.map((c: any) => {
+            // If it's already in the new format with images
+            if (typeof c === 'object' && c.value) {
+                return {
+                    name: c.name || c.value,
+                    value: c.value.toLowerCase().trim(),
+                    hex: c.hex || COLOR_NAME_TO_HEX[c.value.toLowerCase().trim()] || '#000000',
+                    images: c.images || product.images || [],
+                };
+            }
+            // Old format (string)
             if (typeof c === 'string') {
                 const lower = c.toLowerCase().trim();
                 return {
@@ -75,26 +86,39 @@ const Product = () => {
                     images: product.images || [],
                 };
             }
-            const value = (c.value || c.name || '').toString().toLowerCase();
-            const hex = c.hex || COLOR_NAME_TO_HEX[value] || '#000000';
             return {
-                name: c.name || c.value || value,
-                value,
-                hex,
-                images: c.images || product.images || [],
+                name: 'Unknown',
+                value: 'unknown',
+                hex: '#000000',
+                images: product.images || [],
             };
         })
         : [];
 
     const sizes: string[] = product?.sizes || [];
-    const currentColorImages = normalizedColors.find(c => c.value === selectedColor)?.images || product?.images || [];
 
+    // Get images for the currently selected color
+    const currentColorImages = (() => {
+        const selectedColorObj = normalizedColors.find(c => c.value === selectedColor);
+        if (selectedColorObj) {
+            // If color has specific images, use them; otherwise fall back to default
+            return selectedColorObj.images.length > 0
+                ? selectedColorObj.images
+                : product?.images || [];
+        }
+        return product?.images || [];
+    })();
+
+    // Reset image index when color changes
     useEffect(() => {
         setCurrentImageIndex(0);
     }, [selectedColor]);
 
+    // Set default selections
     useEffect(() => {
-        if (sizes.length > 0 && !selectedSize) setSelectedSize(sizes[0]);
+        if (sizes.length > 0 && !selectedSize) {
+            setSelectedSize(sizes[0]);
+        }
         if (normalizedColors.length > 0 && !selectedColor) {
             setSelectedColor(normalizedColors[0].value);
         }
@@ -160,15 +184,7 @@ const Product = () => {
         navigate(-1);
     };
 
-    // const renderStars = (rating: number) => {
-    //     return Array.from({ length: 5 }, (_, i) => (
-    //         <Star
-    //             key={i}
-    //             className={`star ${i < Math.floor(rating) ? '' : 'star--empty'}`}
-    //             fill={i < Math.floor(rating) ? 'currentColor' : 'none'}
-    //         />
-    //     ));
-    // };
+    console.log(" images :", currentColorImages);
 
     return (
         <div className="product-page">
@@ -243,14 +259,6 @@ const Product = () => {
                     <Title level={1} style={{ margin: '0 0 16px', fontWeight: 500 }}>
                         {product?.name}
                     </Title>
-                    {/* <div className="rating-container">
-                        <div className="stars">
-                            {renderStars(reviewStats?.averageRating || 0)}
-                        </div>
-                        <span className="rating-text">
-                            ({reviewStats?.averageRating?.toFixed(1) || '0.0'}) · {reviewStats?.totalReviews || 0} reviews
-                        </span>
-                    </div> */}
 
                     <div className="price-stock">
                         <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
@@ -353,7 +361,6 @@ const Product = () => {
                     </div>
                 </div>
             </div>
-
 
             {user?._id && (
                 <ReviewList
