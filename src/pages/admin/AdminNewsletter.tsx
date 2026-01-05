@@ -109,7 +109,7 @@ const AdminNewsletter = () => {
                 {/* Statistiques */}
                 {stats && (
                     <Row gutter={16} style={{ marginBottom: 24 }}>
-                        <Col xs={24} sm={12} md={6}>
+                        <Col xs={12} sm={12} md={6} style={{paddingBottom:'8px'}}>
                             <Card>
                                 <Statistic
                                     title="Total Abonnés"
@@ -119,7 +119,7 @@ const AdminNewsletter = () => {
                                 />
                             </Card>
                         </Col>
-                        <Col xs={24} sm={12} md={6}>
+                        <Col xs={12} sm={12} md={6} style={{paddingBottom:'8px'}}>
                             <Card>
                                 <Statistic
                                     title="Actifs"
@@ -129,7 +129,7 @@ const AdminNewsletter = () => {
                                 />
                             </Card>
                         </Col>
-                        <Col xs={24} sm={12} md={6}>
+                        <Col xs={12} sm={12} md={6} style={{paddingBottom:'8px'}}>
                             <Card>
                                 <Statistic
                                     title="Inactifs"
@@ -139,7 +139,7 @@ const AdminNewsletter = () => {
                                 />
                             </Card>
                         </Col>
-                        <Col xs={24} sm={12} md={6}>
+                        <Col xs={12} sm={12} md={6} style={{paddingBottom:'8px'}}>
                             <Card>
                                 <Statistic
                                     title="Nouveaux ce mois"

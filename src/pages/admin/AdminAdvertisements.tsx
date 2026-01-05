@@ -257,7 +257,7 @@ const AdminAdvertisements = () => {
             title: 'Actions',
             key: 'actions',
             width: 200,
-            fixed: 'right' as const,
+            // fixed: 'right' as const,
             render: (_: any, record: Advertisement) => (
                 <Space size="small">
                     <Button

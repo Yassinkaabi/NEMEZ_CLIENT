@@ -42,12 +42,13 @@ const AdminReviews = () => {
         }
     };
 
-    const columns = [
+    const columns: any = [
         {
-            title: 'Review ID',
+            title: 'ID',
             dataIndex: 'reviewId',
             key: 'reviewId',
-            width: 100,
+            width: 80,
+            responsive: ['lg'],
         },
         {
             title: 'Product',
@@ -59,10 +60,10 @@ const AdminReviews = () => {
                         <img
                             src={product.images[0]}
                             alt={product.name}
-                            style={{ width: 40, height: 40, objectFit: 'cover', borderRadius: 4 }}
+                            style={{ width: 32, height: 32, objectFit: 'cover', borderRadius: 4 }}
                         />
                     )}
-                    <span>{product?.name || 'N/A'}</span>
+                    <span style={{ fontSize: '13px' }}>{product?.name || 'N/A'}</span>
                 </div>
             ),
         },
@@ -71,28 +72,33 @@ const AdminReviews = () => {
             dataIndex: 'userId',
             key: 'user',
             render: (user: any) => user?.name || 'N/A',
+            // responsive: ['sm'],
         },
         {
             title: 'Rating',
             dataIndex: 'rating',
             key: 'rating',
-            render: (rating: number) => <Rate disabled value={rating} />,
+            render: (rating: number) => <Rate disabled value={rating} style={{ fontSize: '12px' }} />,
         },
         {
             title: 'Comment',
             dataIndex: 'comment',
             key: 'comment',
             ellipsis: true,
+            // responsive: ['md'],
         },
         {
             title: 'Date',
             dataIndex: 'createdAt',
             key: 'createdAt',
             render: (date: string) => new Date(date).toLocaleDateString(),
+            // responsive: ['lg'],
         },
         {
             title: 'Actions',
             key: 'actions',
+            fixed: 'right',
+            width: 60,
             render: (_: any, record: any) => (
                 <Popconfirm
                     title="Are you sure you want to delete this review?"
@@ -113,7 +119,7 @@ const AdminReviews = () => {
 
     return (
         <AdminLayout>
-            <div className="admin-table">
+            <div className="admin-table" style={{overflowX: 'auto'}}>
                 <div className="admin-table-header">
                     <h2 className="admin-table-title">Review Management</h2>
                     <div className="admin-table-actions">
@@ -137,11 +143,13 @@ const AdminReviews = () => {
                     dataSource={reviews}
                     loading={loading}
                     rowKey="_id"
+                    scroll={{ x: 'max-content' }}
                     pagination={{
                         current: pagination.page,
                         pageSize: pagination.limit,
                         total: pagination.total,
                         onChange: (page) => setPagination({ ...pagination, page }),
+                        size: 'small',
                     }}
                 />
             </div>

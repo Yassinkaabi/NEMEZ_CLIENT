@@ -110,7 +110,7 @@ const AdminDashboard = () => {
                 <h1 className="admin-page-title">Dashboard Overview</h1>
 
                 <Row gutter={[24, 24]}>
-                    <Col xs={24} sm={12} lg={6}>
+                    <Col xs={12} sm={12} lg={6}>
                         <StatCard
                             title="Total Users"
                             value={stats.users.totalUsers || 0}
@@ -118,7 +118,7 @@ const AdminDashboard = () => {
                             color="#1890ff"
                         />
                     </Col>
-                    <Col xs={24} sm={12} lg={6}>
+                    <Col xs={12} sm={12} lg={6}>
                         <StatCard
                             title="Total Products"
                             value={stats.products.totalProducts || 0}
@@ -126,7 +126,7 @@ const AdminDashboard = () => {
                             color="#52c41a"
                         />
                     </Col>
-                    <Col xs={24} sm={12} lg={6}>
+                    <Col xs={12} sm={12} lg={6}>
                         <StatCard
                             title="Total Orders"
                             value={stats.orders.totalOrders || 0}
@@ -134,10 +134,10 @@ const AdminDashboard = () => {
                             color="#faad14"
                         />
                     </Col>
-                    <Col xs={24} sm={12} lg={6}>
+                    <Col xs={12} sm={12} lg={6}>
                         <StatCard
                             title="Total Revenue"
-                            value={`${stats.orders.totalRevenue?.toFixed(2) || 0} TND`}
+                            value={`${stats.orders.totalRevenue?.toFixed(2) || 0}`}
                             icon={<DollarOutlined style={{ fontSize: '32px' }} />}
                             color="#f5222d"
                         />
@@ -145,7 +145,7 @@ const AdminDashboard = () => {
                 </Row>
 
                 <Row gutter={[24, 24]} style={{ marginTop: '24px' }}>
-                    <Col xs={24} sm={12} lg={6}>
+                    <Col xs={12} sm={12} lg={6}>
                         <StatCard
                             title="Pending Orders"
                             value={stats.orders.pendingOrders || 0}
@@ -153,7 +153,7 @@ const AdminDashboard = () => {
                             color="#ff7a45"
                         />
                     </Col>
-                    <Col xs={24} sm={12} lg={6}>
+                    <Col xs={12} sm={12} lg={6}>
                         <StatCard
                             title="Low Stock Products"
                             value={stats.products.lowStockProducts || 0}
@@ -161,7 +161,7 @@ const AdminDashboard = () => {
                             color="#fa8c16"
                         />
                     </Col>
-                    <Col xs={24} sm={12} lg={6}>
+                    <Col xs={12} sm={12} lg={6}>
                         <StatCard
                             title="Total Reviews"
                             value={stats.reviews.totalReviews || 0}
@@ -169,7 +169,7 @@ const AdminDashboard = () => {
                             color="#722ed1"
                         />
                     </Col>
-                    <Col xs={24} sm={12} lg={6}>
+                    <Col xs={12} sm={12} lg={6}>
                         <StatCard
                             title="Average Rating"
                             value={stats.reviews.averageRating?.toFixed(1) || 0}

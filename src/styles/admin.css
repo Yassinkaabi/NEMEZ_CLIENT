@@ -7,6 +7,7 @@
 .admin-sider {
     background: #001529;
     box-shadow: 2px 0 8px rgba(0, 0, 0, 0.15);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .admin-sidebar {
@@ -54,6 +55,14 @@
     justify-content: space-between;
     align-items: center;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    position: relative;
+    z-index: 999;
+}
+
+.admin-header-left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
 }
 
 .admin-header-left h1 {
@@ -61,6 +70,27 @@
     font-size: 20px;
     font-weight: 600;
     color: #001529;
+}
+
+.admin-burger-btn {
+    display: none;
+    background: transparent;
+    border: none;
+    font-size: 20px;
+    color: #001529;
+    cursor: pointer;
+    padding: 8px;
+    transition: all 0.3s;
+    border-radius: 4px;
+}
+
+.admin-burger-btn:hover {
+    background: #f0f0f0;
+    color: #1890ff;
+}
+
+.admin-burger-btn:active {
+    transform: scale(0.95);
 }
 
 .admin-header-right {
@@ -95,6 +125,26 @@
     min-height: calc(100vh - 64px);
 }
 
+.admin-sidebar-backdrop {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+    opacity: 0;
+    transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    pointer-events: none;
+}
+
+.admin-sidebar-backdrop.visible {
+    display: block;
+    opacity: 1;
+    pointer-events: auto;
+}
+
 /* Dashboard */
 .admin-dashboard {
     animation: fadeIn 0.5s;
@@ -107,6 +157,17 @@
     margin-bottom: 24px;
 }
 
+.ant-table-content {
+    overflow-x: auto;
+}
+
+:where(.css-dev-only-do-not-override-gsubp0).ant-select-outlined:not(.ant-select-customize-input) .ant-select-selector {
+    /* border: none; */
+    background: transparent;
+}
+.ant-select-arrow {
+    /* right: -5px !important; */
+}
 /* Stat Card */
 .stat-card {
     border-radius: 12px;
@@ -199,6 +260,7 @@
     border-radius: 12px;
     padding: 24px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    height: 100%;
 }
 
 .admin-table-header {
@@ -287,7 +349,7 @@
     padding: 24px;
 }
 
-.admin-modal .ant-form-item-label > label {
+.admin-modal .ant-form-item-label>label {
     font-weight: 500;
 }
 
@@ -331,6 +393,7 @@
         opacity: 0;
         transform: translateY(20px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -338,28 +401,62 @@
 }
 
 /* Responsive */
-@media (max-width: 768px) {
+@media (max-width: 992px) {
+
+    /* Force sidebar to be fixed on mobile */
     .admin-sider {
-        position: fixed;
-        left: -250px;
-        z-index: 999;
-        transition: left 0.3s;
+        position: fixed !important;
+        left: -280px;
+        width: 280px !important;
+        max-width: 280px !important;
+        min-width: 280px !important;
+        flex: 0 0 280px !important;
+        top: 0;
+        bottom: 0;
+        z-index: 1000;
+        transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        height: 100vh;
+        overflow-y: auto;
     }
 
     .admin-sider.open {
-        left: 0;
+        left: 0 !important;
+        box-shadow: 4px 0 12px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Show burger menu on mobile */
+    .admin-burger-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* Header adjustments */
+    .admin-header {
+        padding: 0 16px;
     }
 
     .admin-header-left h1 {
-        font-size: 16px;
+        font-size: 18px;
     }
 
     .admin-user-name {
         display: none;
     }
 
+    /* Content adjustments */
+    .admin-content {
+        padding: 16px;
+    }
+
+    /* Search adjustments */
     .admin-search {
         width: 200px;
+    }
+
+    /* Table header responsive */
+    .admin-table {
+        padding: 16px;
     }
 
     .admin-table-header {
@@ -375,5 +472,62 @@
 
     .admin-search {
         width: 100%;
+    }
+
+    /* Stats responsive */
+    .stat-card-value {
+        font-size: 24px;
+    }
+
+    .stat-card-icon {
+        width: 56px;
+        height: 56px;
+        font-size: 28px;
+    }
+}
+
+@media (max-width: 576px) {
+    .admin-header-left h1 {
+        font-size: 16px;
+    }
+
+    .admin-burger-btn {
+        font-size: 18px;
+        padding: 6px;
+    }
+
+    .admin-btn-icon {
+        font-size: 16px;
+        padding: 6px;
+    }
+
+    .admin-content {
+        padding: 12px;
+    }
+
+    .admin-page-title {
+        font-size: 22px;
+        margin-bottom: 16px;
+    }
+
+    .stat-card-value {
+        font-size: 20px;
+    }
+
+    .stat-card-title {
+        font-size: 12px;
+    }
+
+    .admin-table-title {
+        font-size: 18px;
+    }
+
+    /* Make sidebar full width on very small screens */
+    .admin-sider {
+        left: -100vw;
+        width: 25vw !important;
+        max-width: 25vw !important;
+        min-width: 25vw !important;
+        flex: 0 0 25vw !important;
     }
 }

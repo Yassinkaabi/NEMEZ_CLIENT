@@ -85,7 +85,7 @@ const AdminOrders = () => {
                 <Select
                     value={status}
                     onChange={(value) => handleStatusChange(record._id, value)}
-                    style={{ width: 120 }}
+                    style={{ width: 110 }}
                 >
                     <Select.Option value="pending">
                         <Tag className="status-badge pending">Pending</Tag>
