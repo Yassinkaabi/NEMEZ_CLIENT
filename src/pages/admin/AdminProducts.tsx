@@ -13,11 +13,26 @@ interface Variant {
     stock: number;
 }
 
-// Predefined options
+interface ColorOption {
+    name: string;
+    value: string;
+    hex: string;
+    images: string[];
+}
+
 const AVAILABLE_SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL', '3XL'];
-const AVAILABLE_COLORS = [
-    'noir', 'blanc', 'gris', 'bleu', 'rouge', 'vert', 'rose',
-    'marron'
+const COLOR_PRESETS = [
+    { name: 'Noir', value: 'noir', hex: '#000000' },
+    { name: 'Blanc', value: 'blanc', hex: '#ffffff' },
+    { name: 'Gris', value: 'gris', hex: '#8c8c8c' },
+    { name: 'Bleu', value: 'bleu', hex: '#0074d9' },
+    { name: 'Rouge', value: 'rouge', hex: '#ff4136' },
+    { name: 'Vert', value: 'vert', hex: '#2ecc40' },
+    { name: 'Rose', value: 'rose', hex: '#ff69b4' },
+    { name: 'Marron', value: 'marron', hex: '#8b4513' },
+    { name: 'Jaune', value: 'jaune', hex: '#f1c40f' },
+    { name: 'Beige', value: 'beige', hex: '#f5f5dc' },
+    { name: 'Orange', value: 'orange', hex: '#ffa500' },
 ];
 
 const AdminProducts = () => {
@@ -27,15 +42,17 @@ const AdminProducts = () => {
     const [pagination, setPagination] = useState({ page: 1, limit: 10, total: 0 });
     const [search, setSearch] = useState('');
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isColorImagesModalOpen, setIsColorImagesModalOpen] = useState(false);
     const [isVariantModalOpen, setIsVariantModalOpen] = useState(false);
     const [editingProduct, setEditingProduct] = useState<any>(null);
     const [form] = Form.useForm();
     const [variantForm] = Form.useForm();
     const [tempSizes, setTempSizes] = useState<string[]>([]);
-    const [tempColors, setTempColors] = useState<string[]>([]);
+    const [colorOptions, setColorOptions] = useState<ColorOption[]>([]);
     const [variants, setVariants] = useState<Variant[]>([]);
     const [uploadedImages, setUploadedImages] = useState<string[]>([]);
     const [uploadingImages, setUploadingImages] = useState(false);
+    const [uploadingColorImages, setUploadingColorImages] = useState<{ [key: string]: boolean }>({});
 
     useEffect(() => {
         fetchProducts();
@@ -78,6 +95,7 @@ const AdminProducts = () => {
         form.resetFields();
         setVariants([]);
         setUploadedImages([]);
+        setColorOptions([]);
         setIsModalOpen(true);
     };
 
@@ -89,9 +107,46 @@ const AdminProducts = () => {
             price: product.price,
             categoryId: product.categoryId._id,
             sizes: product.sizes,
-            colors: product.colors,
         });
         setUploadedImages(product.images || []);
+        
+        // Handle colors - convert old format to new if needed
+        const colors = Array.isArray(product.colors) 
+            ? product.colors.map((c: any) => {
+                // Already in new format
+                if (typeof c === 'object' && c.value && c.images) {
+                    return {
+                        name: c.name || c.value,
+                        value: c.value.toLowerCase().trim(),
+                        hex: c.hex || '#000000',
+                        images: Array.isArray(c.images) ? c.images : []
+                    };
+                }
+                // Old format (string)
+                if (typeof c === 'string') {
+                    const lower = c.toLowerCase().trim();
+                    const preset = COLOR_PRESETS.find(p => p.value === lower);
+                    return {
+                        name: c,
+                        value: lower,
+                        hex: preset?.hex || '#000000',
+                        images: []
+                    };
+                }
+                // Fallback
+                return {
+                    name: 'Unknown',
+                    value: 'unknown',
+                    hex: '#000000',
+                    images: []
+                };
+              })
+            : [];
+        setColorOptions(colors);
+        
+        // Set the colors field in the form
+        form.setFieldValue('colors', colors.map((c: any) => c.value));
+        
         setVariants(product.variants || []);
         setIsModalOpen(true);
     };
@@ -119,22 +174,69 @@ const AdminProducts = () => {
         }
     };
 
+    const handleColorImageUpload = async (file: File, colorValue: string) => {
+        try {
+            setUploadingColorImages(prev => ({ ...prev, [colorValue]: true }));
+            const url = await adminService.uploadImage(file);
+            setColorOptions(prev => 
+                prev.map(color => 
+                    color.value === colorValue 
+                        ? { 
+                            ...color, 
+                            images: [...(Array.isArray(color.images) ? color.images : []), url] 
+                          }
+                        : color
+                )
+            );
+            message.success(`Image uploaded for ${colorValue}`);
+        } catch (error) {
+            message.error('Failed to upload image');
+        } finally {
+            setUploadingColorImages(prev => ({ ...prev, [colorValue]: false }));
+        }
+    };
+
     const handleRemoveImage = (index: number) => {
         setUploadedImages(prev => prev.filter((_, i) => i !== index));
     };
 
+    const handleRemoveColorImage = (colorValue: string, imageIndex: number) => {
+        setColorOptions(prev => 
+            prev.map(color => 
+                color.value === colorValue 
+                    ? { 
+                        ...color, 
+                        images: (Array.isArray(color.images) ? color.images : []).filter((_, i) => i !== imageIndex) 
+                      }
+                    : color
+            )
+        );
+    };
+
     const handleBasicInfoSubmit = (values: any) => {
         if (uploadedImages.length === 0) {
-            message.error('Please upload at least one image');
+            message.error('Please upload at least one default image');
             return;
         }
-        const sizes = values.sizes;
-        const colors = values.colors;
+        
+        const selectedColors = values.colors || [];
+        const newColorOptions = selectedColors.map((colorValue: string) => {
+            const existing = colorOptions.find(c => c.value === colorValue);
+            if (existing) return existing;
+            
+            const preset = COLOR_PRESETS.find(c => c.value === colorValue);
+            return preset || { name: colorValue, value: colorValue, hex: '#000000', images: [] };
+        });
+        
+        setColorOptions(newColorOptions);
+        setIsModalOpen(false);
+        setIsColorImagesModalOpen(true);
+    };
 
+    const handleColorImagesSubmit = () => {
+        const sizes = form.getFieldValue('sizes');
         setTempSizes(sizes);
-        setTempColors(colors);
 
-        // Create a map of existing variants to preserve stock
         const existingVariantsMap = new Map();
         if (variants && variants.length > 0) {
             variants.forEach(v => {
@@ -147,14 +249,13 @@ const AdminProducts = () => {
         let index = 0;
 
         sizes.forEach((size: string) => {
-            colors.forEach((color: string) => {
-                const key = `${size}-${color}`;
-                // Preserve stock if variant existed, otherwise default to 10
+            colorOptions.forEach((color) => {
+                const key = `${size}-${color.value}`;
                 const stock = existingVariantsMap.has(key) ? existingVariantsMap.get(key) : 10;
 
                 newVariants.push({
                     size,
-                    color,
+                    color: color.value,
                     stock,
                 });
                 variantFields[`variant_${index}`] = stock;
@@ -165,19 +266,15 @@ const AdminProducts = () => {
         setVariants(newVariants);
         variantForm.setFieldsValue(variantFields);
 
-        setIsModalOpen(false);
+        setIsColorImagesModalOpen(false);
         setIsVariantModalOpen(true);
     };
 
-
-
     const handleFinalSubmit = async () => {
         try {
-            // Validate variant form
             await variantForm.validateFields();
             const variantValues = variantForm.getFieldsValue();
 
-            // Update variants with form values
             const updatedVariants = variants.map((variant, index) => ({
                 ...variant,
                 stock: variantValues[`variant_${index}`] || 0,
@@ -188,7 +285,7 @@ const AdminProducts = () => {
                 ...formValues,
                 images: uploadedImages,
                 sizes: tempSizes,
-                colors: tempColors,
+                colors: colorOptions,
                 variants: updatedVariants,
             };
 
@@ -205,6 +302,7 @@ const AdminProducts = () => {
             variantForm.resetFields();
             setEditingProduct(null);
             setVariants([]);
+            setColorOptions([]);
             fetchProducts();
         } catch (error) {
             message.error('Failed to save product');
@@ -214,6 +312,11 @@ const AdminProducts = () => {
     const handleCancelVariantModal = () => {
         variantForm.resetFields();
         setIsVariantModalOpen(false);
+        setIsColorImagesModalOpen(true);
+    };
+
+    const handleCancelColorImagesModal = () => {
+        setIsColorImagesModalOpen(false);
         setIsModalOpen(true);
     };
 
@@ -330,9 +433,9 @@ const AdminProducts = () => {
                     }}
                 />
 
-                {/* Basic Info Modal */}
+                {/* Step 1: Basic Info Modal */}
                 <Modal
-                    title={editingProduct ? 'Edit Product - Basic Info' : 'Add Product - Basic Info'}
+                    title={`${editingProduct ? 'Edit' : 'Add'} Product - Step 1: Basic Info`}
                     open={isModalOpen}
                     onCancel={() => {
                         setIsModalOpen(false);
@@ -340,6 +443,7 @@ const AdminProducts = () => {
                         setEditingProduct(null);
                         setVariants([]);
                         setUploadedImages([]);
+                        setColorOptions([]);
                     }}
                     footer={null}
                     className="admin-modal"
@@ -364,10 +468,10 @@ const AdminProducts = () => {
 
                         <Form.Item
                             name="price"
-                            label="Price"
+                            label="Price (TND)"
                             rules={[{ required: true, message: 'Please enter price' }]}
                         >
-                            <InputNumber min={0} step={0.01} style={{ width: '100%' }} prefix="$" />
+                            <InputNumber min={0} step={0.01} style={{ width: '100%' }} />
                         </Form.Item>
 
                         <Form.Item
@@ -384,10 +488,7 @@ const AdminProducts = () => {
                             </Select>
                         </Form.Item>
 
-                        <Form.Item
-                            label="Product Images"
-                            required
-                        >
+                        <Form.Item label="Default Images" required>
                             <div style={{ marginBottom: 16 }}>
                                 <Upload
                                     accept="image/*"
@@ -433,12 +534,12 @@ const AdminProducts = () => {
                         <Form.Item
                             name="sizes"
                             label="Sizes"
-                            rules={[{ required: true, message: 'Please enter sizes' }]}
+                            rules={[{ required: true, message: 'Please select sizes' }]}
                         >
                             <Select
                                 mode="multiple"
                                 style={{ width: '100%' }}
-                                placeholder="Select or type sizes"
+                                placeholder="Select sizes"
                                 options={AVAILABLE_SIZES.map(size => ({ label: size, value: size }))}
                             />
                         </Form.Item>
@@ -446,27 +547,111 @@ const AdminProducts = () => {
                         <Form.Item
                             name="colors"
                             label="Colors"
-                            rules={[{ required: true, message: 'Please enter colors' }]}
+                            rules={[{ required: true, message: 'Please select colors' }]}
                         >
                             <Select
                                 mode="multiple"
                                 style={{ width: '100%' }}
-                                placeholder="Select or type colors"
-                                options={AVAILABLE_COLORS.map(color => ({ label: color, value: color }))}
+                                placeholder="Select colors"
+                                options={COLOR_PRESETS.map(color => ({ label: color.name, value: color.value }))}
                             />
                         </Form.Item>
 
                         <Form.Item>
                             <Button type="primary" htmlType="submit" block className="admin-btn">
-                                Next: Configure Stock
+                                Next: Upload Color Images
                             </Button>
                         </Form.Item>
                     </Form>
                 </Modal>
 
-                {/* Variant Stock Modal */}
+                {/* Step 2: Color Images Modal */}
                 <Modal
-                    title="Configure Variant Stock"
+                    title={`${editingProduct ? 'Edit' : 'Add'} Product - Step 2: Color-Specific Images`}
+                    open={isColorImagesModalOpen}
+                    onCancel={handleCancelColorImagesModal}
+                    onOk={handleColorImagesSubmit}
+                    okText="Next: Configure Stock"
+                    cancelText="Back"
+                    className="admin-modal"
+                    width={900}
+                >
+                    <p style={{ marginBottom: 16, color: '#666' }}>
+                        Upload specific images for each color variant. If no images are uploaded for a color, default images will be used.
+                    </p>
+                    <div style={{ display: 'grid', gap: 16 }}>
+                        {colorOptions.map((color) => (
+                            <Card 
+                                key={color.value} 
+                                size="small" 
+                                title={
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                                        <div 
+                                            style={{ 
+                                                width: 24, 
+                                                height: 24, 
+                                                borderRadius: 4, 
+                                                background: color.hex,
+                                                border: '1px solid #d9d9d9'
+                                            }} 
+                                        />
+                                        <span>{color.name}</span>
+                                    </div>
+                                }
+                            >
+                                <div style={{ marginBottom: 12 }}>
+                                    <Upload
+                                        accept="image/*"
+                                        showUploadList={false}
+                                        beforeUpload={(file) => {
+                                            handleColorImageUpload(file, color.value);
+                                            return false;
+                                        }}
+                                        disabled={uploadingColorImages[color.value]}
+                                    >
+                                        <Button
+                                            icon={<UploadOutlined />}
+                                            size="small"
+                                            loading={uploadingColorImages[color.value]}
+                                            disabled={uploadingColorImages[color.value]}
+                                        >
+                                            {uploadingColorImages[color.value] ? 'Uploading...' : `Upload for ${color.name}`}
+                                        </Button>
+                                    </Upload>
+                                </div>
+                                {Array.isArray(color.images) && color.images.length > 0 ? (
+                                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(80px, 1fr))', gap: 8 }}>
+                                        {color.images.map((url, index) => (
+                                            <div key={index} style={{ position: 'relative', paddingTop: '100%', borderRadius: 4, overflow: 'hidden', border: '1px solid #d9d9d9' }}>
+                                                <img
+                                                    src={url}
+                                                    alt={`${color.name} ${index + 1}`}
+                                                    style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover' }}
+                                                />
+                                                <Button
+                                                    type="primary"
+                                                    danger
+                                                    size="small"
+                                                    icon={<CloseCircleOutlined />}
+                                                    onClick={() => handleRemoveColorImage(color.value, index)}
+                                                    style={{ position: 'absolute', top: 2, right: 2, padding: '2px 4px', fontSize: 12 }}
+                                                />
+                                            </div>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <div style={{ padding: 20, textAlign: 'center', color: '#999', background: '#f5f5f5', borderRadius: 4 }}>
+                                        No images uploaded (will use default images)
+                                    </div>
+                                )}
+                            </Card>
+                        ))}
+                    </div>
+                </Modal>
+
+                {/* Step 3: Variant Stock Modal */}
+                <Modal
+                    title={`${editingProduct ? 'Edit' : 'Add'} Product - Step 3: Configure Stock`}
                     open={isVariantModalOpen}
                     onCancel={handleCancelVariantModal}
                     onOk={handleFinalSubmit}
