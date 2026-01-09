@@ -70,7 +70,7 @@ const Home = () => {
                             }}
                         >
                             <div className="hero-content">
-                                <Title level={1} className="hero-title">
+                                <Title level={1} className="hero-title" style={{marginBottom:'20px'}}>
                                     {slide.title}
                                 </Title>
                                 <Paragraph className="hero-subtitle">

@@ -1,5 +1,6 @@
 import { Card, Typography, Button, Tag, Space } from 'antd';
 import { Link, useNavigate } from 'react-router-dom';
+import "../styles/productCard.css"
 
 const { Text } = Typography;
 
@@ -78,7 +79,17 @@ const ProductCard = ({ product }: ProductCardProps) => {
         return '#000000';
     };
 
-
+    // Image par défaut (première couleur ou image par défaut)
+    const defaultImage = (() => {
+        // if (Array.isArray(product.colors) && product.colors.length > 0) {
+        //     const firstColor = product.colors[0];
+        //     if (typeof firstColor === 'object' && Array.isArray(firstColor.images) && firstColor.images.length > 0) {
+        //         return firstColor.images[0];
+        //     }
+        // }
+        return product.images?.[1] || '';
+    })();
+    
     // Couleurs disponibles (limiter l'affichage à 4 maximum)
     const displayColors = product.colors?.slice(0, 4) || [];
     const hasMoreColors = product.colors?.length > 4;
@@ -101,6 +112,17 @@ const ProductCard = ({ product }: ProductCardProps) => {
                                 filter: !isInStock ? 'grayscale(50%) opacity(0.7)' : 'none'
                             }}
                         />
+
+                        {defaultImage && (
+                            <img
+                                alt={`${product.name} - hover`}
+                                src={defaultImage}
+                                className="product-image hover"
+                                style={{
+                                    filter: !isInStock ? 'grayscale(50%) opacity(0.7)' : 'none',
+                                }}
+                            />
+                        )}
                         <Tag
                             color={isInStock ? 'success' : 'error'}
                             className="stock-badge"
@@ -177,318 +199,6 @@ const ProductCard = ({ product }: ProductCardProps) => {
                     <span className="button-icon">→</span>
                 </Button>
             </Card>
-
-            <style>{`
-                .product-card-link {
-                    display: block;
-                    height: 100%;
-                }
-                
-                .product-card {
-                    height: 100%;
-                    display: flex;
-                    flex-direction: column;
-                    border-radius: 8px;
-                    border: 1px solid #e8e8e8;
-                    transition: all 0.3s ease;
-                }
-                
-                .product-card:hover {
-                    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-                    transform: translateY(-2px);
-                }
-                
-                .product-image-container {
-                    position: relative;
-                    overflow: hidden;
-                    background: #f5f5f5;
-                }
-                
-                .product-image {
-                    height: 280px;
-                    width: 100%;
-                    object-fit: cover;
-                    transition: transform 0.3s ease;
-                }
-                
-                .product-card:hover .product-image {
-                    transform: scale(1.05);
-                }
-                
-                .stock-badge {
-                    position: absolute;
-                    top: 12px;
-                    left: 12px;
-                    fontSize: 12px;
-                    fontWeight: 600;
-                    padding: 4px 12px;
-                    border: none;
-                    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-                    z-index: 1;
-                }
-                
-                .product-name {
-                    font-size: 19px;
-                    display: block;
-                    // margin-bottom: 8px;
-                    line-height: 1.4;
-                    height: 44px;
-                    overflow: hidden;
-                    text-overflow: ellipsis;
-                    display: -webkit-box;
-                    -webkit-line-clamp: 2;
-                    -webkit-box-orient: vertical;
-                }
-                
-                .product-colors {
-                    margin-bottom: 8px;
-                    min-height: 20px;
-                }
-                
-                .color-dot {
-                    width: 20px;
-                    height: 20px;
-                    border-radius: 50%;
-                    display: inline-block;
-                    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
-                    cursor: pointer;
-                    transition: transform 0.2s ease;
-                }
-                
-                .color-dot:hover {
-                    transform: scale(1.2);
-                }
-                
-                .product-sizes {
-                    margin-bottom: 8px;
-                    min-height: 22px;
-                }
-                
-                .size-tag {
-                    display: inline-block;
-                    padding: 2px 8px;
-                    background: #f0f0f0;
-                    border: 1px solid #d9d9d9;
-                    border-radius: 4px;
-                    font-size: 11px;
-                    font-weight: 500;
-                    color: #595959;
-                    line-height: 1.4;
-                }
-                
-                .more-indicator {
-                    font-size: 11px;
-                    color: #8c8c8c;
-                    font-weight: 500;
-                }
-                
-                .product-price {
-                    font-size: 18px;
-                    color: #000000c4;
-                    font-weight: 600;
-                    display: block;
-                    margin-bottom: 12px;
-                    margin-top: 8px;
-                }
-                
-                .product-button {
-                    margin-top: auto;
-                    height: 40px;
-                    font-weight: 600;
-                    border-radius: 8px;
-                    border: none;
-                    background: linear-gradient(135deg, #b1b3b8ff 0%, #4b4a4bff 100%);
-                    position: relative;
-                    overflow: hidden;   
-                    transition: all 0.3s ease;
-                    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
-                }
-                
-                .product-button:hover:not(:disabled) {
-                    transform: translateY(-2px);
-                    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
-                    background: linear-gradient(135deg, #4b4a4bff 0%, #b1b3b8ff 100%) !important;
-                }
-                
-                .product-button:disabled {
-                    background: #d9d9d9;
-                    box-shadow: none;
-                    cursor: not-allowed;
-                }
-                
-                .product-button .button-text {
-                    display: inline-block;
-                    transition: transform 0.3s ease;
-                }
-                
-                .product-button .button-icon {
-                    display: inline-block;
-                    margin-left: 6px;
-                    transition: transform 0.3s ease;
-                    font-size: 16px;
-                    font-weight: bold;
-                }
-                
-                .product-button:hover:not(:disabled) .button-text {
-                    transform: translateX(-3px);
-                }
-                
-                .product-button:hover:not(:disabled) .button-icon {
-                    transform: translateX(3px);
-                }
-                
-                .product-button::before {
-                    content: '';
-                    position: absolute;
-                    top: 0;
-                    left: -100%;
-                    width: 100%;
-                    height: 100%;
-                    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-                    transition: left 0.5s ease;
-                }
-                
-                .product-button:hover:not(:disabled)::before {
-                    left: 100%;
-                }
-
-                /* Tablet */
-                @media (max-width: 991px) {
-                    .product-image {
-                        height: 240px;
-                    }
-                    .product-name {
-                        font-size: 15px;
-                    }
-                    .product-price {
-                        font-size: 17px;
-                    }
-                }
-
-                /* Mobile - 2 colonnes */
-                @media (max-width: 767px) {
-                    .product-card {
-                        border-radius: 6px;
-                    }
-                    
-                    .product-image {
-                        height: 180px;
-                    }
-                    
-                    .stock-badge {
-                        top: 8px;
-                        left: 8px;
-                        font-size: 10px;
-                        padding: 3px 8px;
-                    }
-                    
-                    .product-name {
-                        font-size: 13px;
-                        margin-bottom: 6px;
-                        height: 36px;
-                    }
-                    
-                    .product-colors {
-                        margin-bottom: 6px;
-                        min-height: 16px;
-                    }
-                    
-                    .color-dot {
-                        width: 16px;
-                        height: 16px;
-                    }
-                    
-                    .product-sizes {
-                        margin-bottom: 6px;
-                        min-height: 18px;
-                    }
-                    
-                    .size-tag {
-                        padding: 1px 6px;
-                        font-size: 10px;
-                        border-radius: 3px;
-                    }
-                    
-                    .more-indicator {
-                        font-size: 10px;
-                    }
-                    
-                    .product-price {
-                        font-size: 15px;
-                        margin-bottom: 10px;
-                        margin-top: 6px;
-                    }
-                    
-                    .product-button {
-                        height: 36px;
-                        font-size: 13px;
-                    }
-                    
-                    .ant-card-body {
-                        padding: 12px !important;
-                    }
-                }
-
-                /* Très petits écrans */
-                @media (max-width: 479px) {
-                    .product-image {
-                        height: 160px;
-                    }
-                    
-                    .stock-badge {
-                        top: 6px;
-                        left: 6px;
-                        font-size: 9px;
-                        padding: 2px 6px;
-                    }
-                    
-                    .product-name {
-                        font-size: 12px;
-                        height: 32px;
-                        margin-bottom: 4px;
-                    }
-                    
-                    .product-colors {
-                        margin-bottom: 5px;
-                        min-height: 14px;
-                    }
-                    
-                    .color-dot {
-                        width: 14px;
-                        height: 14px;
-                    }
-                    
-                    .product-sizes {
-                        margin-bottom: 5px;
-                        min-height: 16px;
-                    }
-                    
-                    .size-tag {
-                        padding: 1px 5px;
-                        font-size: 9px;
-                        border-radius: 2px;
-                    }
-                    
-                    .more-indicator {
-                        font-size: 9px;
-                    }
-                    
-                    .product-price {
-                        font-size: 14px;
-                        margin-bottom: 8px;
-                        margin-top: 5px;
-                    }
-                    
-                    .product-button {
-                        height: 32px;
-                        font-size: 12px;
-                    }
-                    
-                    .ant-card-body {
-                        padding: 10px !important;
-                    }
-                }
-            `}</style>
         </Link>
     );
 };
