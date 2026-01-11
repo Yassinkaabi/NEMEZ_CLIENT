@@ -38,15 +38,9 @@ const Category = () => {
     const pagination = data?.data?.pagination || {};
 
     const sizeOptions = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
-    const colorOptions = ['noir', 'blanc', 'bleu', 'gris', 'rouge', 'vert'];
 
     const handleSizeChange = (checkedValues: any) => {
         setFilters({ ...filters, sizes: checkedValues });
-        setPage(1);
-    };
-
-    const handleColorChange = (checkedValues: any) => {
-        setFilters({ ...filters, colors: checkedValues });
         setPage(1);
     };
 
@@ -87,14 +81,14 @@ const Category = () => {
                                 />
                             </Panel>
 
-                            <Panel header="Couleur" key="3">
+                            {/* <Panel header="Couleur" key="3">
                                 <Checkbox.Group
                                     options={colorOptions}
                                     value={filters.colors}
                                     onChange={handleColorChange}
                                     style={{ display: 'flex', flexDirection: 'column', gap: 8 }}
                                 />
-                            </Panel>
+                            </Panel> */}
                         </Collapse>
                     </div>
                 </Col>
