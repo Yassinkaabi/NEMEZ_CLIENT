@@ -3,6 +3,7 @@ import { Table, Button, Input, Modal, Form, InputNumber, Select, message, Popcon
 import { EditOutlined, DeleteOutlined, PlusOutlined, SearchOutlined, UploadOutlined, CloseCircleOutlined } from '@ant-design/icons';
 import AdminLayout from '../../components/admin/AdminLayout';
 import * as adminService from '../../services/adminService';
+import { COLOR_PRESETS, COLOR_MAP } from '../../constants/colors';
 import '../../styles/admin.css';
 
 const { Search } = Input;
@@ -21,19 +22,6 @@ interface ColorOption {
 }
 
 const AVAILABLE_SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL', '3XL'];
-const COLOR_PRESETS = [
-    { name: 'Noir', value: 'noir', hex: '#000000' },
-    { name: 'Blanc', value: 'blanc', hex: '#ffffff' },
-    { name: 'Gris', value: 'gris', hex: '#8c8c8c' },
-    { name: 'Bleu', value: 'bleu', hex: '#0074d9' },
-    { name: 'Rouge', value: 'rouge', hex: '#ff4136' },
-    { name: 'Vert', value: 'vert', hex: '#2ecc40' },
-    { name: 'Rose', value: 'rose', hex: '#ff69b4' },
-    { name: 'Marron', value: 'marron', hex: '#8b4513' },
-    { name: 'Jaune', value: 'jaune', hex: '#f1c40f' },
-    { name: 'Beige', value: 'beige', hex: '#f5f5dc' },
-    { name: 'Orange', value: 'orange', hex: '#ffa500' },
-];
 
 const AdminProducts = () => {
     const [products, setProducts] = useState([]);
@@ -109,9 +97,9 @@ const AdminProducts = () => {
             sizes: product.sizes,
         });
         setUploadedImages(product.images || []);
-        
+
         // Handle colors - convert old format to new if needed
-        const colors = Array.isArray(product.colors) 
+        const colors = Array.isArray(product.colors)
             ? product.colors.map((c: any) => {
                 // Already in new format
                 if (typeof c === 'object' && c.value && c.images) {
@@ -127,9 +115,9 @@ const AdminProducts = () => {
                     const lower = c.toLowerCase().trim();
                     const preset = COLOR_PRESETS.find(p => p.value === lower);
                     return {
-                        name: c,
+                        name: preset?.name || c,
                         value: lower,
-                        hex: preset?.hex || '#000000',
+                        hex: preset?.hex || COLOR_MAP[lower] || '#000000',
                         images: []
                     };
                 }
@@ -140,13 +128,13 @@ const AdminProducts = () => {
                     hex: '#000000',
                     images: []
                 };
-              })
+            })
             : [];
         setColorOptions(colors);
-        
+
         // Set the colors field in the form
         form.setFieldValue('colors', colors.map((c: any) => c.value));
-        
+
         setVariants(product.variants || []);
         setIsModalOpen(true);
     };
@@ -178,13 +166,13 @@ const AdminProducts = () => {
         try {
             setUploadingColorImages(prev => ({ ...prev, [colorValue]: true }));
             const url = await adminService.uploadImage(file);
-            setColorOptions(prev => 
-                prev.map(color => 
-                    color.value === colorValue 
-                        ? { 
-                            ...color, 
-                            images: [...(Array.isArray(color.images) ? color.images : []), url] 
-                          }
+            setColorOptions(prev =>
+                prev.map(color =>
+                    color.value === colorValue
+                        ? {
+                            ...color,
+                            images: [...(Array.isArray(color.images) ? color.images : []), url]
+                        }
                         : color
                 )
             );
@@ -201,13 +189,13 @@ const AdminProducts = () => {
     };
 
     const handleRemoveColorImage = (colorValue: string, imageIndex: number) => {
-        setColorOptions(prev => 
-            prev.map(color => 
-                color.value === colorValue 
-                    ? { 
-                        ...color, 
-                        images: (Array.isArray(color.images) ? color.images : []).filter((_, i) => i !== imageIndex) 
-                      }
+        setColorOptions(prev =>
+            prev.map(color =>
+                color.value === colorValue
+                    ? {
+                        ...color,
+                        images: (Array.isArray(color.images) ? color.images : []).filter((_, i) => i !== imageIndex)
+                    }
                     : color
             )
         );
@@ -218,16 +206,16 @@ const AdminProducts = () => {
             message.error('Please upload at least one default image');
             return;
         }
-        
+
         const selectedColors = values.colors || [];
         const newColorOptions = selectedColors.map((colorValue: string) => {
             const existing = colorOptions.find(c => c.value === colorValue);
             if (existing) return existing;
-            
+
             const preset = COLOR_PRESETS.find(c => c.value === colorValue);
-            return preset || { name: colorValue, value: colorValue, hex: '#000000', images: [] };
+            return preset || { name: colorValue, value: colorValue, hex: COLOR_MAP[colorValue] || '#000000', images: [] };
         });
-        
+
         setColorOptions(newColorOptions);
         setIsModalOpen(false);
         setIsColorImagesModalOpen(true);
@@ -553,8 +541,26 @@ const AdminProducts = () => {
                                 mode="multiple"
                                 style={{ width: '100%' }}
                                 placeholder="Select colors"
-                                options={COLOR_PRESETS.map(color => ({ label: color.name, value: color.value }))}
-                            />
+                                optionLabelProp="label"
+                            >
+                                {COLOR_PRESETS.map(color => (
+                                    <Select.Option key={color.value} value={color.value} label={color.name}>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                                            <div
+                                                style={{
+                                                    width: 16,
+                                                    height: 16,
+                                                    borderRadius: '50%',
+                                                    background: color.hex,
+                                                    border: '1px solid #d9d9d9'
+                                                }}
+                                            />
+                                            <span>{color.name}</span>
+                                            <span style={{ marginLeft: 'auto', color: '#999', fontSize: '12px' }}>{color.hex}</span>
+                                        </div>
+                                    </Select.Option>
+                                ))}
+                            </Select>
                         </Form.Item>
 
                         <Form.Item>
@@ -581,19 +587,19 @@ const AdminProducts = () => {
                     </p>
                     <div style={{ display: 'grid', gap: 16 }}>
                         {colorOptions.map((color) => (
-                            <Card 
-                                key={color.value} 
-                                size="small" 
+                            <Card
+                                key={color.value}
+                                size="small"
                                 title={
                                     <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                                        <div 
-                                            style={{ 
-                                                width: 24, 
-                                                height: 24, 
-                                                borderRadius: 4, 
+                                        <div
+                                            style={{
+                                                width: 24,
+                                                height: 24,
+                                                borderRadius: 4,
                                                 background: color.hex,
                                                 border: '1px solid #d9d9d9'
-                                            }} 
+                                            }}
                                         />
                                         <span>{color.name}</span>
                                     </div>

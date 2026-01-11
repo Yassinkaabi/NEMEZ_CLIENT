@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { ChevronLeft, ChevronRight, ShoppingCart, Home, Check, X, Minus, Plus } from 'lucide-react';
+import { ChevronLeft, ChevronRight, ShoppingCart, Home, Minus, Plus } from 'lucide-react';
 import '../styles/product.css';
 import { api } from '../services/api';
+import { COLOR_MAP } from '../constants/colors';
 import { useToast } from '../hooks/use-toast';
 import { addToCart } from '../store/cartSlice';
 import { useAppDispatch, useAppSelector } from '../store/redux';
@@ -11,18 +12,6 @@ import ReviewList from '../components/ReviewList';
 import type { RootState } from '../store';
 import { Typography } from 'antd';
 
-const COLOR_NAME_TO_HEX: Record<string, string> = {
-    black: '#000000', noir: '#000000',
-    white: '#ffffff', blanc: '#ffffff',
-    gray: '#8c8c8c', gris: '#8c8c8c',
-    beige: '#f5f5dc',
-    navy: '#001f3f', bleu: '#0074d9',
-    red: '#ff4136', rouge: '#ff4136',
-    green: '#2ecc40', vert: '#2ecc40',
-    pink: '#ff69b4', rose: '#ff69b4',
-    brown: '#8b4513', marron: '#8b4513',
-    orange: '#ffa500', jaune: '#f1c40f',
-};
 
 const { Title } = Typography;
 
@@ -72,7 +61,7 @@ const Product = () => {
                 return {
                     name: c.name || c.value,
                     value: c.value.toLowerCase().trim(),
-                    hex: c.hex || COLOR_NAME_TO_HEX[c.value.toLowerCase().trim()] || '#000000',
+                    hex: c.hex || COLOR_MAP[c.value.toLowerCase().trim()] || '#000000',
                     images: c.images || product.images || [],
                 };
             }
@@ -82,7 +71,7 @@ const Product = () => {
                 return {
                     name: c,
                     value: lower,
-                    hex: COLOR_NAME_TO_HEX[lower] || '#000000',
+                    hex: COLOR_MAP[lower] || '#000000',
                     images: product.images || [],
                 };
             }
@@ -184,8 +173,6 @@ const Product = () => {
         navigate(-1);
     };
 
-    console.log(" images :", currentColorImages);
-
     return (
         <div className="product-page">
             {/* Navigation */}
@@ -266,10 +253,10 @@ const Product = () => {
                                 {product?.price} TND
                             </Title>
                         </div>
-                        <span className={`stock-badge ${isInStock ? 'stock-badge--in-stock' : 'stock-badge--out-of-stock'}`}>
+                        {/* <span className={`stock-badge ${isInStock ? 'stock-badge--in-stock' : 'stock-badge--out-of-stock'}`}>
                             {isInStock ? <Check size={14} /> : <X size={14} />}
                             {isInStock ? 'In Stock' : 'Out of Stock'}
-                        </span>
+                        </span> */}
                     </div>
 
                     {selectedSize && selectedColor && isInStock && variantStock < 10 && (
