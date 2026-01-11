@@ -97,9 +97,9 @@ const Home = () => {
                     <Title level={2} className="section-title">
                         Nouveautés
                     </Title>
-                    <Paragraph className="section-subtitle">
+                    {/* <Paragraph className="section-subtitle">
                         Les derniers produits ajoutés à notre collection
-                    </Paragraph>
+                    </Paragraph> */}
                 </div>
 
                 {productsLoading ? (

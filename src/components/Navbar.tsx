@@ -68,7 +68,7 @@ const Navbar = () => {
                                 {category.name}
                             </Link>
                         ))}
-                        <Link to="/news">News</Link>
+                        <Link to="/news">Actualités</Link>
                     </nav>
 
                     {/* Actions à droite */}
@@ -111,7 +111,7 @@ const Navbar = () => {
                                         </Link>
                                         {user.role === "admin" && (
                                             <Link to="/admin" onClick={handleDropdownLinkClick}>
-                                                Admin panel
+                                                Tableau de bord
                                             </Link>
                                         )}
                                         <button onClick={handleLogout} className="navbar-dropdown-item">
@@ -170,7 +170,7 @@ const Navbar = () => {
                             {category.name}
                         </Link>
                     ))}
-                    <Link to="/news" onClick={() => setMobileMenuOpen(false)}>News</Link>
+                    <Link to="/news" onClick={() => setMobileMenuOpen(false)}>Actualités</Link>
                 </nav>
 
                 <div className="navbar-mobile-user">

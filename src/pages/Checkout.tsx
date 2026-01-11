@@ -62,7 +62,7 @@ const Checkout = () => {
             address: values.address,
             phone: values.phone,
             email: values.email,
-            total: cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0) + 7
+            total: cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0) + 8
         };
 
         createOrderMutation.mutate(orderData);
@@ -84,7 +84,7 @@ const Checkout = () => {
                 ))}
                 <hr />
                 <Text strong style={{ fontSize: 18, color: '#E53935' }}>
-                    Total: {total + 7} DT
+                    Total: {total + 8} DT
                 </Text>
             </Card>
 

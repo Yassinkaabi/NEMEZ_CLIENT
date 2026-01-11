@@ -261,7 +261,7 @@ const Cart = () => {
 
                         <div className="cart-summary-row">
                             <Text>Livraison</Text>
-                            <Text strong>7 DT</Text>
+                            <Text strong>8 DT</Text>
                         </div>
 
                         <hr className="cart-summary-divider" />
@@ -269,7 +269,7 @@ const Cart = () => {
                         <div className="cart-summary-row cart-summary-total">
                             <Title level={4}>Total</Title>
                             <Title level={4} style={{ color: '#E53935' }}>
-                                {total + 7} DT
+                                {total + 8} DT
                             </Title>
                         </div>
 

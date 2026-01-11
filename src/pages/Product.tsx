@@ -76,8 +76,8 @@ const Product = () => {
                 };
             }
             return {
-                name: 'Unknown',
-                value: 'unknown',
+                name: 'Inconnu',
+                value: 'inconnu',
                 hex: '#000000',
                 images: product.images || [],
             };
@@ -116,8 +116,8 @@ const Product = () => {
     const handleAddToCart = () => {
         if (!selectedSize || !selectedColor) {
             toast({
-                title: "Selection required",
-                description: "Please choose a size and color",
+                title: "Sélection requise",
+                description: "Veuillez choisir une taille et une couleur",
                 variant: "destructive",
             });
             return;
@@ -125,8 +125,8 @@ const Product = () => {
 
         if (!isInStock) {
             toast({
-                title: "Out of stock",
-                description: `${selectedSize} / ${selectedColor} is currently unavailable`,
+                title: "Rupture de stock",
+                description: `${selectedSize} / ${selectedColor} est actuellement indisponible`,
                 variant: "destructive",
             });
             return;
@@ -134,8 +134,8 @@ const Product = () => {
 
         if (quantity > variantStock) {
             toast({
-                title: "Limited stock",
-                description: `Only ${variantStock} item${variantStock > 1 ? 's' : ''} available`,
+                title: "Stock limité",
+                description: `Seulement ${variantStock} article${variantStock > 1 ? 's' : ''} disponible${variantStock > 1 ? 's' : ''}`,
                 variant: "destructive",
             });
             return;
@@ -156,7 +156,7 @@ const Product = () => {
         );
 
         toast({
-            title: "Added to cart!",
+            title: "Ajouté au panier !",
             description: `${product.name} (${selectedSize}, ${selectedColor}) × ${quantity}`,
         });
     };
@@ -179,13 +179,13 @@ const Product = () => {
             <nav className="product-nav">
                 <button className="back-button" onClick={handleBack}>
                     <ChevronLeft size={18} />
-                    <span>Back</span>
+                    <span>Retour</span>
                 </button>
 
                 <div className="breadcrumb" style={{ display: 'flex', alignItems: 'center' }}>
                     <Link to="/" className="breadcrumb-link">
                         <Home size={14} style={{ marginRight: 4, display: 'inline' }} />
-                        Home
+                        Accueil
                     </Link>
                     <span className="breadcrumb-separator">›</span>
                     {product ? (
@@ -193,7 +193,7 @@ const Product = () => {
                             {product.categoryId.name}
                         </Link>
                     ) : (
-                        <span className="breadcrumb-link">Category</span>
+                        <span className="breadcrumb-link">Catégorie</span>
                     )}
                     <span className="breadcrumb-separator">›</span>
                     <span className="breadcrumb-current">{product?.name}</span>
@@ -261,19 +261,19 @@ const Product = () => {
 
                     {selectedSize && selectedColor && isInStock && variantStock < 10 && (
                         <p className="stock-info">
-                            <strong>{variantStock}</strong> {variantStock === 1 ? 'item available' : 'items available'} for {selectedSize} / {selectedColor}
+                            <strong>{variantStock}</strong> {variantStock === 1 ? 'article disponible' : 'articles disponibles'} pour {selectedSize} / {selectedColor}
                         </p>
                     )}
 
                     {(!selectedSize || !selectedColor) && totalStock > 0 && (
                         <p className="stock-info">
-                            {totalStock} {totalStock === 1 ? 'item available' : 'items available'} total
+                            {totalStock} {totalStock === 1 ? 'article disponible' : 'articles disponibles'} au total
                         </p>
                     )}
 
                     <div className="variant-selectors">
                         <div className="variant-group">
-                            <span className="variant-label">Available Size</span>
+                            <span className="variant-label">Tailles disponibles</span>
                             <div className="size-options">
                                 {sizes.map((size) => {
                                     const sizeVariants = product?.variants?.filter((v: Variant) => v.size === size) || [];
@@ -294,7 +294,7 @@ const Product = () => {
                         </div>
 
                         <div className="variant-group">
-                            <span className="variant-label">Available Color</span>
+                            <span className="variant-label">Couleurs disponibles</span>
                             <div className="color-options">
                                 {normalizedColors.map((color) => {
                                     const colorVariant = product?.variants?.find(
@@ -316,6 +316,10 @@ const Product = () => {
                                 })}
                             </div>
                         </div>
+                    </div>
+
+                    <div className="product-description" style={{ margin: '24px 0', lineHeight: 1.6, color: '#666', fontSize: '15px' }}>
+                        {product?.description}
                     </div>
 
                     <div className="actions-row">
@@ -343,7 +347,7 @@ const Product = () => {
                             disabled={!isInStock}
                         >
                             <ShoppingCart size={18} />
-                            {isInStock ? 'Add to Cart' : 'Unavailable'}
+                            {isInStock ? 'Ajouter au panier' : 'Indisponible'}
                         </button>
                     </div>
                 </div>

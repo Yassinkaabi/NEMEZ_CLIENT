@@ -75,6 +75,7 @@
 
 .navbar-icon-btn {
     background: none;
+    color: inherit;
     border: none;
     cursor: pointer;
     position: relative;
@@ -157,6 +158,7 @@
 .navbar-mobile-toggle {
     display: block;
     background: none;
+    color: inherit;
     border: none;
     cursor: pointer;
 }

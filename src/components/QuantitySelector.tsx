@@ -35,7 +35,7 @@ const QuantitySelector: React.FC<QuantitySelectorProps> = ({ onAddToCart }) => {
                 onClick={() => onAddToCart(quantity)}
                 style={{ background: '#000', border: 'none', borderRadius: 8, height: 56, padding: '0 40px' }}
             >
-                Add to cart
+                Ajouter au panier
             </Button>
         </div>
     );
