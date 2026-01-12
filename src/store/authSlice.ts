@@ -75,6 +75,18 @@ export const signupUser = createAsyncThunk(
     }
 );
 
+export const resendVerification = createAsyncThunk(
+    'auth/resendVerification',
+    async (email: string, { rejectWithValue }) => {
+        try {
+            const response = await api.post('/auth/resend-verification', { email });
+            return response.data.message;
+        } catch (error: any) {
+            return rejectWithValue(error.response?.data?.message || 'Erreur lors du renvoi de l\'email');
+        }
+    }
+);
+
 const authSlice = createSlice({
     name: 'auth',
     initialState,

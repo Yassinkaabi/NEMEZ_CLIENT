@@ -76,7 +76,7 @@ const EmailVerification = () => {
                                     borderRadius: 8,
                                     fontSize: 16,
                                     fontWeight: 600,
-                                    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                                    background: '#222222',
                                     border: 'none'
                                 }}
                             >
