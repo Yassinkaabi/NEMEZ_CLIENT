@@ -4,7 +4,7 @@ import { api } from '../services/api';
 import { useAppDispatch, useAppSelector } from '../store/redux';
 import { useEffect } from 'react';
 import { loadUserProfile, updateUserProfile } from '../store/authSlice';
-import { generateInvoicePDF } from '../components/InvoicePDF';
+// import { generateInvoicePDF } from '../components/InvoicePDF';
 
 const { Title, Text } = Typography;
 
@@ -90,20 +90,20 @@ const Account = () => {
                 return <Tag color={colors[status]}>{labels[status] || status}</Tag>;
             },
         },
-        {
-            title: 'Facture',
-            key: 'invoice',
-            render: (_: any, record: any) => (
-                <Button
-                    type="link"
-                    size="small"
-                    style={{ color: '#E53935', fontWeight: 500 }}
-                    onClick={() => generateInvoicePDF(record, user)}
-                >
-                    Voir la facture PDF
-                </Button>
-            ),
-        },
+        // {
+        //     title: 'Facture',
+        //     key: 'invoice',
+        //     render: (_: any, record: any) => (
+        //         <Button
+        //             type="link"
+        //             size="small"
+        //             style={{ color: '#E53935', fontWeight: 500 }}
+        //             onClick={() => generateInvoicePDF(record, user)}
+        //         >
+        //             Voir la facture PDF
+        //         </Button>
+        //     ),
+        // },
     ];
 
     // Affichage pendant le chargement
