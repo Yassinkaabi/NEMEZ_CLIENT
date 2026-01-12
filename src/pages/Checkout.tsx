@@ -10,7 +10,7 @@ import { loadUserProfile } from '../store/authSlice';
 const { Title, Text } = Typography;
 
 const Checkout = () => {
-    const { user, isAuthenticated } = useAppSelector((state) => state.auth);
+    const { user } = useAppSelector((state) => state.auth);
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
     const [form] = Form.useForm();
@@ -34,9 +34,9 @@ const Checkout = () => {
     const createOrderMutation = useMutation({
         mutationFn: (orderData: any) => api.post('/orders', orderData),
         onSuccess: () => {
-            message.success('Commande confirmée ! Vous recevrez un email de confirmation.');
+            message.success('Commande confirmée !');
             dispatch(clearCart());
-            navigate('/account');
+            navigate('/');
         },
         onError: () => {
             message.error('Erreur lors de la création de la commande');
@@ -44,14 +44,14 @@ const Checkout = () => {
     });
 
     const handleSubmit = (values: any) => {
-        if (!isAuthenticated || !user) {
-            message.warning("Veuillez vous connecter avant de passer commande.");
-            navigate('/login');
-            return;
-        }
+        // if (!isAuthenticated || !user) {
+        //     message.warning("Veuillez vous connecter avant de passer commande.");
+        //     navigate('/login');
+        //     return;
+        // }
 
         const orderData = {
-            userId: user._id,
+            userId: user?._id,
             items: cartItems.map(item => ({
                 productId: item.productId,
                 quantity: item.quantity,
@@ -59,6 +59,7 @@ const Checkout = () => {
                 color: item.color,
                 price: item.price
             })),
+            name: values.name,
             address: values.address,
             phone: values.phone,
             email: values.email,
@@ -104,7 +105,6 @@ const Checkout = () => {
                         name="email"
                         initialValue={user?.email || ''}
                         rules={[
-                            { required: true, message: 'Veuillez entrer votre email' },
                             { type: 'email', message: 'Email invalide' }
                         ]}
                     >

@@ -1,10 +1,9 @@
 import { Form, Input, Button, Card, Typography, message } from 'antd';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../store/redux';
-import { loginUser, clearError, resendVerification } from '../store/authSlice';
+import { loginUser, clearError } from '../store/authSlice';
 import type { RootState } from '../store';
-import { useEffect, useState } from 'react';
-import { MailOutlined } from '@ant-design/icons';
+import { useEffect } from 'react';
 
 const { Title, Text } = Typography;
 
@@ -14,9 +13,6 @@ const Login = () => {
     const [form] = Form.useForm();
 
     const { user, isLoading, isAuthenticated } = useAppSelector((state: RootState) => state.auth);
-    const [showResend, setShowResend] = useState(false);
-    const [unverifiedEmail, setUnverifiedEmail] = useState('');
-    const [resendLoading, setResendLoading] = useState(false);
 
     useEffect(() => {
         if (isAuthenticated && user) {
@@ -41,30 +37,10 @@ const Login = () => {
         } else {
             // Erreur - ne pas naviguer
             const errorMsg = resultAction.payload as string || 'Email ou mot de passe incorrect';
-
-            if (errorMsg.toLowerCase().includes('vérifier') || errorMsg.toLowerCase().includes('verify')) {
-                setShowResend(true);
-                setUnverifiedEmail(values.email);
-            }
-
+            // message.error(errorMsg);
             form.setFields([
                 { name: 'password', errors: [errorMsg] }
             ]);
-        }
-    };
-
-    const handleResend = async () => {
-        if (!unverifiedEmail) return;
-
-        setResendLoading(true);
-        try {
-            await dispatch(resendVerification(unverifiedEmail)).unwrap();
-            message.success('Email de vérification renvoyé !');
-            setShowResend(false);
-        } catch (error: any) {
-            message.error(error || 'Erreur lors du renvoi de l\'email');
-        } finally {
-            setResendLoading(false);
         }
     };
 
@@ -107,41 +83,11 @@ const Login = () => {
                         size="large"
                         block
                         loading={isLoading}
-                        style={{
-                            height: 48,
-                            fontSize: 16,
-                            background: 'linear-gradient(135deg, #222 0%, #444 100%)',
-                            border: 'none',
-                            borderRadius: 8
-                        }}
+                        style={{ height: 48, fontSize: 16 }}
                     >
                         Se connecter
                     </Button>
                 </Form>
-
-                {showResend && (
-                    <div style={{
-                        marginTop: 20,
-                        padding: 15,
-                        background: '#fff7e6',
-                        border: '1px solid #ffd591',
-                        borderRadius: 8,
-                        textAlign: 'center'
-                    }}>
-                        <Text style={{ display: 'block', marginBottom: 10 }}>
-                            Vous n'avez pas reçu l'email ou le lien a expiré ?
-                        </Text>
-                        <Button
-                            icon={<MailOutlined />}
-                            onClick={handleResend}
-                            loading={resendLoading}
-                            type="dashed"
-                            danger
-                        >
-                            Renvoyer l'email de vérification
-                        </Button>
-                    </div>
-                )}
 
                 <div style={{ textAlign: 'center', marginTop: 24 }}>
                     <Text>Pas encore de compte ? </Text>

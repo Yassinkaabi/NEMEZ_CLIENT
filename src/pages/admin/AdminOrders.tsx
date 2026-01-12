@@ -31,6 +31,8 @@ const AdminOrders = () => {
             });
             setOrders(response.data.orders);
             setPagination({ ...pagination, total: response.data.pagination.total });
+            console.log("orders", response.data.orders);
+
         } catch (error) {
             message.error('Failed to fetch orders');
         } finally {
@@ -62,9 +64,8 @@ const AdminOrders = () => {
         },
         {
             title: 'Customer',
-            dataIndex: 'userId',
+            dataIndex: 'name',
             key: 'customer',
-            render: (user: any) => user?.name || 'N/A',
         },
         {
             title: 'Email',
@@ -170,7 +171,7 @@ const AdminOrders = () => {
                     {selectedOrder && (
                         <div>
                             <h3>Customer Information</h3>
-                            <p><strong>Name:</strong> {selectedOrder.userId?.name}</p>
+                            <p><strong>Name:</strong> {selectedOrder.name}</p>
                             <p><strong>Email:</strong> {selectedOrder.email}</p>
                             <p><strong>Phone:</strong> {selectedOrder.phone}</p>
                             <p><strong>Address:</strong> {selectedOrder.address}</p>

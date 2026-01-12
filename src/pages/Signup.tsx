@@ -1,6 +1,4 @@
-import { useState } from 'react';
-import { Form, Input, Button, Card, Typography, message, Result } from 'antd';
-import { MailOutlined } from '@ant-design/icons';
+import { Form, Input, Button, Card, Typography, message } from 'antd';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../store/redux';
 import { signupUser } from '../store/authSlice';
@@ -14,13 +12,12 @@ const Signup = () => {
     const [form] = Form.useForm();
 
     const { isLoading } = useAppSelector((state: RootState) => state.auth);
-    const [isSuccess, setIsSuccess] = useState(false);
 
     const handleSubmit = async (values: any) => {
         try {
             await dispatch(signupUser(values)).unwrap();
-            setIsSuccess(true);
             message.success('Inscription réussie !');
+            navigate('/', { replace: true });
         } catch (error: any) {
             const errorMsg = error || 'Erreur lors de l\'inscription';
             message.error(errorMsg);
@@ -40,68 +37,55 @@ const Signup = () => {
                     Inscription
                 </Title>
 
-                {isSuccess ? (
-                    <Result
-                        status="success"
-                        title="Inscription réussie !"
-                        subTitle="Un email de confirmation vous a été envoyé. Veuillez vérifier votre boîte de réception pour activer votre compte."
-                        extra={[
-                            <Button type="primary" key="login" onClick={() => navigate('/login')}>
-                                Aller à la connexion
-                            </Button>
+                <Form form={form} layout="vertical" onFinish={handleSubmit}>
+                    <Form.Item
+                        label="Nom complet"
+                        name="name"
+                        rules={[{ required: true, message: 'Veuillez entrer votre nom' }]}
+                    >
+                        <Input size="large" placeholder="Ahmed Ben Ali" />
+                    </Form.Item>
+
+                    <Form.Item
+                        label="Email"
+                        name="email"
+                        rules={[
+                            { required: true, message: 'Veuillez entrer votre email' },
+                            { type: 'email', message: 'Email invalide' }
                         ]}
-                    />
-                ) : (
-                    <Form form={form} layout="vertical" onFinish={handleSubmit}>
-                        <Form.Item
-                            label="Nom complet"
-                            name="name"
-                            rules={[{ required: true, message: 'Veuillez entrer votre nom' }]}
-                        >
-                            <Input size="large" placeholder="Ahmed Ben Ali" />
-                        </Form.Item>
+                    >
+                        <Input size="large" placeholder="email@example.com" />
+                    </Form.Item>
 
-                        <Form.Item
-                            label="Email"
-                            name="email"
-                            rules={[
-                                { required: true, message: 'Veuillez entrer votre email' },
-                                { type: 'email', message: 'Email invalide' }
-                            ]}
-                        >
-                            <Input size="large" placeholder="email@example.com" prefix={<MailOutlined style={{ color: 'rgba(0,0,0,.25)' }} />} />
-                        </Form.Item>
+                    <Form.Item
+                        label="Téléphone"
+                        name="phone"
+                    >
+                        <Input size="large" placeholder="20 123 456" />
+                    </Form.Item>
 
-                        <Form.Item
-                            label="Téléphone"
-                            name="phone"
-                        >
-                            <Input size="large" placeholder="20 123 456" />
-                        </Form.Item>
+                    <Form.Item
+                        label="Mot de passe"
+                        name="password"
+                        rules={[
+                            { required: true, message: 'Veuillez entrer un mot de passe' },
+                            { min: 6, message: 'Au moins 6 caractères' }
+                        ]}
+                    >
+                        <Input.Password size="large" placeholder="••••••••" />
+                    </Form.Item>
 
-                        <Form.Item
-                            label="Mot de passe"
-                            name="password"
-                            rules={[
-                                { required: true, message: 'Veuillez entrer un mot de passe' },
-                                { min: 6, message: 'Au moins 6 caractères' }
-                            ]}
-                        >
-                            <Input.Password size="large" placeholder="••••••••" />
-                        </Form.Item>
-
-                        <Button
-                            type="primary"
-                            htmlType="submit"
-                            size="large"
-                            block
-                            loading={isLoading}
+                    <Button
+                        type="primary"
+                        htmlType="submit"
+                        size="large"
+                        block
+                        loading={isLoading}
                         style={{ height: 48, fontSize: 16 }}
-                        >
-                            S'inscrire
-                        </Button>
-                    </Form>
-                )}
+                    >
+                        S'inscrire
+                    </Button>
+                </Form>
 
                 <div style={{ textAlign: 'center', marginTop: 24 }}>
                     <Text>Déjà inscrit ? </Text>

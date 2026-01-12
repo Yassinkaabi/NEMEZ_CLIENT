@@ -1,12 +1,12 @@
-import { Tabs, Card, Form, Input, Button, Typography, Table, Tag, message } from 'antd';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { Tabs, Card, Form, Input, Button, Typography, message } from 'antd';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { api } from '../services/api';
 import { useAppDispatch, useAppSelector } from '../store/redux';
 import { useEffect } from 'react';
 import { loadUserProfile, updateUserProfile } from '../store/authSlice';
 // import { generateInvoicePDF } from '../components/InvoicePDF';
 
-const { Title, Text } = Typography;
+const { Title } = Typography;
 
 const Account = () => {
     const dispatch = useAppDispatch();
@@ -32,10 +32,10 @@ const Account = () => {
         }
     }, [user, form]);
 
-    const { data: ordersData } = useQuery({
-        queryKey: ['orders'],
-        queryFn: () => api.get('/orders/my-orders'),
-    });
+    // const { data: ordersData } = useQuery({
+    //     queryKey: ['orders'],
+    //     queryFn: () => api.get('/orders/my-orders'),
+    // });
 
     const updateProfileMutation = useMutation({
         mutationFn: (data: any) => api.put('/auth/profile', data),
@@ -53,62 +53,62 @@ const Account = () => {
         updateProfileMutation.mutate(values);
     };
 
-    const orderColumns = [
-        {
-            title: 'Commande',
-            dataIndex: '_id',
-            key: '_id',
-            render: (id: string) => <Text code>#{id.slice(-8)}</Text>,
-        },
-        {
-            title: 'Date',
-            dataIndex: 'createdAt',
-            key: 'createdAt',
-            render: (date: string) => new Date(date).toLocaleDateString('fr-FR'),
-        },
-        {
-            title: 'Montant',
-            dataIndex: 'totalAmount',
-            key: 'totalAmount',
-            render: (amount: number) => <Text strong>{amount} DT</Text>,
-        },
-        {
-            title: 'Statut',
-            dataIndex: 'status',
-            key: 'status',
-            render: (status: string) => {
-                const colors: Record<string, string> = {
-                    pending: 'orange',
-                    confirmed: 'blue',
-                    delivered: 'green',
-                };
-                const labels: Record<string, string> = {
-                    pending: 'En attente',
-                    confirmed: 'Confirmée',
-                    delivered: 'Livrée',
-                };
-                return <Tag color={colors[status]}>{labels[status] || status}</Tag>;
-            },
-        },
-        // {
-        //     title: 'Facture',
-        //     key: 'invoice',
-        //     render: (_: any, record: any) => (
-        //         <Button
-        //             type="link"
-        //             size="small"
-        //             style={{ color: '#E53935', fontWeight: 500 }}
-        //             onClick={() => generateInvoicePDF(record, user)}
-        //         >
-        //             Voir la facture PDF
-        //         </Button>
-        //     ),
-        // },
-    ];
+    // const orderColumns = [
+    //     {
+    //         title: 'Commande',
+    //         dataIndex: '_id',
+    //         key: '_id',
+    //         render: (id: string) => <Text code>#{id.slice(-8)}</Text>,
+    //     },
+    //     {
+    //         title: 'Date',
+    //         dataIndex: 'createdAt',
+    //         key: 'createdAt',
+    //         render: (date: string) => new Date(date).toLocaleDateString('fr-FR'),
+    //     },
+    //     {
+    //         title: 'Montant',
+    //         dataIndex: 'totalAmount',
+    //         key: 'totalAmount',
+    //         render: (amount: number) => <Text strong>{amount} DT</Text>,
+    //     },
+    //     {
+    //         title: 'Statut',
+    //         dataIndex: 'status',
+    //         key: 'status',
+    //         render: (status: string) => {
+    //             const colors: Record<string, string> = {
+    //                 pending: 'orange',
+    //                 confirmed: 'blue',
+    //                 delivered: 'green',
+    //             };
+    //             const labels: Record<string, string> = {
+    //                 pending: 'En attente',
+    //                 confirmed: 'Confirmée',
+    //                 delivered: 'Livrée',
+    //             };
+    //             return <Tag color={colors[status]}>{labels[status] || status}</Tag>;
+    //         },
+    //     },
+    //     // {
+    //     //     title: 'Facture',
+    //     //     key: 'invoice',
+    //     //     render: (_: any, record: any) => (
+    //     //         <Button
+    //     //             type="link"
+    //     //             size="small"
+    //     //             style={{ color: '#E53935', fontWeight: 500 }}
+    //     //             onClick={() => generateInvoicePDF(record, user)}
+    //     //         >
+    //     //             Voir la facture PDF
+    //     //         </Button>
+    //     //     ),
+    //     // },
+    // ];
 
     // Affichage pendant le chargement
     if (isLoading) return <Title level={3}>Chargement du profil...</Title>;
-    if (!user) return <Title level={3}>Vous n'êtes pas connecté</Title>;
+    // if (!user) return <Title level={3}>Vous n'êtes pas connecté</Title>;
 
     const tabItems = [
         {
@@ -149,44 +149,44 @@ const Account = () => {
                 </Card>
             ),
         },
-        {
-            key: 'orders',
-            label: 'Mes commandes',
-            children: (
-                <Card title="Historique de vos commandes" style={{ borderRadius: 12 }}>
-                    {/* Conteneur avec scroll horizontal */}
-                    <div
-                        style={{
-                            overflowX: 'auto',
-                            borderRadius: 8,
-                            border: '1px solid #f0f0f0',
-                            backgroundColor: '#fff',
-                        }}
-                    >
-                        <Table
-                            dataSource={ordersData?.data?.orders || []}
-                            columns={orderColumns}
-                            rowKey="_id"
-                            pagination={{
-                                pageSize: 10,
-                                position: ['bottomCenter'],
-                                showSizeChanger: false,
-                            }}
-                            loading={!ordersData}
-                            scroll={{ x: 600 }} // Active le scroll horizontal dès 600px
-                            style={{ minWidth: 600 }}
-                        />
-                    </div>
+        // {
+        //     key: 'orders',
+        //     label: 'Mes commandes',
+        //     children: (
+        //         <Card title="Historique de vos commandes" style={{ borderRadius: 12 }}>
+        //             {/* Conteneur avec scroll horizontal */}
+        //             <div
+        //                 style={{
+        //                     overflowX: 'auto',
+        //                     borderRadius: 8,
+        //                     border: '1px solid #f0f0f0',
+        //                     backgroundColor: '#fff',
+        //                 }}
+        //             >
+        //                 {/* <Table
+        //                     dataSource={ordersData?.data?.orders || []}
+        //                     columns={orderColumns}
+        //                     rowKey="_id"
+        //                     pagination={{
+        //                         pageSize: 10,
+        //                         position: ['bottomCenter'],
+        //                         showSizeChanger: false,
+        //                     }}
+        //                     loading={!ordersData}
+        //                     scroll={{ x: 600 }} // Active le scroll horizontal dès 600px
+        //                     style={{ minWidth: 600 }}
+        //                 /> */}
+        //             </div>
 
-                    {/* Message si aucune commande */}
-                    {ordersData?.data?.orders?.length === 0 && (
-                        <div style={{ textAlign: 'center', padding: '40px 20px', color: '#999' }}>
-                            <Text type="secondary">Aucune commande pour le moment</Text>
-                        </div>
-                    )}
-                </Card>
-            ),
-        },
+        //             {/* Message si aucune commande */}
+        //             {ordersData?.data?.orders?.length === 0 && (
+        //                 <div style={{ textAlign: 'center', padding: '40px 20px', color: '#999' }}>
+        //                     <Text type="secondary">Aucune commande pour le moment</Text>
+        //                 </div>
+        //             )}
+        //         </Card>
+        //     ),
+        // },
     ];
 
     return (
