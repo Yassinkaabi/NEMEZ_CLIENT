@@ -8,6 +8,7 @@ export interface User {
     role: string;
     phone: string;
     address: string;
+    isVerified: boolean;
 }
 
 interface AuthState {
@@ -67,12 +68,7 @@ export const signupUser = createAsyncThunk(
     async (data: any, { rejectWithValue }) => {
         try {
             const response = await api.post('/auth/signup', data);
-            const { user, accessToken, refreshToken } = response.data;
-
-            localStorage.setItem('accessToken', accessToken);
-            localStorage.setItem('refreshToken', refreshToken);
-
-            return user as User;
+            return response.data.user as User;
         } catch (error: any) {
             return rejectWithValue(error.response?.data?.message || 'Erreur lors de l\'inscription');
         }
@@ -147,10 +143,10 @@ const authSlice = createSlice({
                 state.isLoading = true;
                 state.error = null;
             })
-            .addCase(signupUser.fulfilled, (state, action) => {
+            .addCase(signupUser.fulfilled, (state) => {
                 state.isLoading = false;
-                state.user = action.payload;
-                state.isAuthenticated = true;
+                state.user = null; // Don't log in automatically
+                state.isAuthenticated = false;
                 state.error = null;
             })
             .addCase(signupUser.rejected, (state, action) => {

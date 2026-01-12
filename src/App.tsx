@@ -26,6 +26,7 @@ import AdminAdvertisements from './pages/admin/AdminAdvertisements';
 import AdminNewsletter from './pages/admin/AdminNewsletter';
 import UnsubscribeResult from './pages/UnsubscribePage';
 import NewsPage from './pages/News';
+import EmailVerification from './pages/EmailVerification';
 
 import { Toaster } from './components/ui/toaster';
 
@@ -67,6 +68,7 @@ function App() {
             <Route path="/cart" element={<Cart />} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
+            <Route path="/verify-email/:token" element={<EmailVerification />} />
             <Route path="/unsubscribe-result" element={<UnsubscribeResult />} />
             <Route path="/news" element={<NewsPage />} />
             {/* Routes protégées */}
