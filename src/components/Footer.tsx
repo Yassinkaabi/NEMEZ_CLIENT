@@ -1,6 +1,7 @@
 import { Layout, Typography } from 'antd';
 import { FacebookOutlined, InstagramOutlined, TikTokOutlined } from '@ant-design/icons';
 import NewsletterSubscription from './NewsletterSubscription';
+import '../styles/footer.css';
 
 const { Footer: AntFooter } = Layout;
 const { Text } = Typography;

@@ -1,0 +1,5 @@
+@media (max-width: 480px) {
+    :where(.css-dev-only-do-not-override-gsubp0).ant-layout-footer {
+        padding: 20px 0px !important;
+    }
+}
