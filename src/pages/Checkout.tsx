@@ -36,7 +36,7 @@ const Checkout = () => {
         onSuccess: () => {
             message.success('Commande confirmée !');
             dispatch(clearCart());
-            navigate('/');
+            navigate('/order-success');
         },
         onError: () => {
             message.error('Erreur lors de la création de la commande');

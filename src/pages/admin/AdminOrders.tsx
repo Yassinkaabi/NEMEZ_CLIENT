@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { Table, Button, Input, Select, Tag, message, Modal } from 'antd';
-import { EyeOutlined, SearchOutlined } from '@ant-design/icons';
+import { Table, Button, Input, Select, Tag, message, Modal, Popconfirm } from 'antd';
+import { EyeOutlined, SearchOutlined, DeleteOutlined } from '@ant-design/icons';
 import AdminLayout from '../../components/admin/AdminLayout';
 import * as adminService from '../../services/adminService';
 import '../../styles/admin.css';
@@ -53,6 +53,16 @@ const AdminOrders = () => {
     const handleViewDetails = (order: any) => {
         setSelectedOrder(order);
         setIsModalOpen(true);
+    };
+
+    const handleDeleteOrder = async (orderId: string) => {
+        try {
+            await adminService.deleteOrder(orderId);
+            message.success('Order deleted successfully');
+            fetchOrders();
+        } catch (error) {
+            message.error('Failed to delete order');
+        }
     };
 
     const columns = [
@@ -110,14 +120,31 @@ const AdminOrders = () => {
             title: 'Actions',
             key: 'actions',
             render: (_: any, record: any) => (
-                <Button
-                    type="link"
-                    icon={<EyeOutlined />}
-                    onClick={() => handleViewDetails(record)}
-                    className="action-btn view"
-                >
-                    View
-                </Button>
+                <div className="action-btns">
+                    <Button
+                        type="link"
+                        icon={<EyeOutlined />}
+                        onClick={() => handleViewDetails(record)}
+                        className="action-btn view"
+                    >
+                        View
+                    </Button>
+                    <Popconfirm
+                        title="Are you sure you want to delete this order?"
+                        onConfirm={() => handleDeleteOrder(record._id)}
+                        okText="Yes"
+                        cancelText="No"
+                    >
+                        <Button
+                            type="link"
+                            danger
+                            icon={<DeleteOutlined />}
+                            className="action-btn delete"
+                        >
+                            Delete
+                        </Button>
+                    </Popconfirm>
+                </div>
             ),
         },
     ];
