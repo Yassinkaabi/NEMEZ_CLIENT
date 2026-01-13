@@ -129,8 +129,7 @@
 /* Responsive */
 @media (max-width: 768px) {
     .newsletter-subscription {
-        padding: 40px 20px;
-        margin: 40px 0;
+        padding: 0 20px;
     }
 
     .newsletter-icon {

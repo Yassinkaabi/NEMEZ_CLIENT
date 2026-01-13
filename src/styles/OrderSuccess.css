@@ -1,0 +1,103 @@
+/* OrderSuccess.css */
+
+.order-success-container {
+    max-width: 800px;
+    margin: 80px auto;
+    padding: 0 20px;
+    min-height: 60vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.order-success-card {
+    width: 100%;
+    border-radius: 16px !important;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+    text-align: center;
+    padding: 40px 20px;
+}
+
+.order-success-icon {
+    color: #28a745;
+    font-size: 72px;
+}
+
+.order-success-title {
+    margin: 20px 0 10px !important;
+}
+
+.order-success-subtitle-container {
+    margin-bottom: 30px;
+}
+
+.order-success-text {
+    font-size: 16px;
+    color: #666;
+}
+
+.order-success-button {
+    height: 50px !important;
+    padding: 0 40px !important;
+    font-size: 16px !important;
+    border-radius: 8px !important;
+    background: #222 !important;
+    border: none !important;
+}
+
+/* Responsiveness */
+
+@media (max-width: 768px) {
+    .order-success-container {
+        margin: 40px auto;
+        min-height: 50vh;
+    }
+
+    .order-success-card {
+        padding: 30px 15px;
+    }
+
+    .order-success-icon {
+        font-size: 60px;
+    }
+
+    .order-success-title {
+        font-size: 24px !important;
+    }
+
+    .order-success-text {
+        font-size: 14px;
+    }
+}
+
+@media (max-width: 480px) {
+    .order-success-container {
+        margin: 20px auto;
+    }
+
+    :where(.css-dev-only-do-not-override-gsubp0).ant-result {
+        padding: 28px 0px !important;
+    }
+
+    .order-success-card {
+        padding: 20px 10px;
+        box-shadow: none;
+        border: none !important;
+    }
+
+    .order-success-icon {
+        font-size: 48px;
+    }
+
+    .order-success-title {
+        font-size: 20px !important;
+    }
+
+    .order-success-button {
+        width: 100%;
+        padding: 0 20px !important;
+    }
+    .order-success-button span {
+        font-size: 14px !important;
+    }
+}

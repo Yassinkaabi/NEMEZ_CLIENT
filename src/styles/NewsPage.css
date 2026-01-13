@@ -1,5 +1,5 @@
 .news-page {
-    min-height: 100vh;
+    /* min-height: 100vh; */
     background: #f5f5f5;
 }
 
@@ -222,6 +222,7 @@
 
     .upcoming-product-section,
     .news-grid-section {
+        margin-top: 40px;
         padding: 40px 0;
     }
 }
