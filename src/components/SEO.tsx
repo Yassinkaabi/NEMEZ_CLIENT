@@ -15,6 +15,7 @@ interface SEOProps {
     category?: string;
     updatedTime?: string;
     fbAppId?: string;
+    schema?: any;
 }
 
 const SEO = ({
@@ -30,6 +31,7 @@ const SEO = ({
     category,
     updatedTime,
     fbAppId = defaultSEOConfig.fbAppId,
+    schema,
 }: SEOProps) => {
     // Ensure image URL is absolute
     const absoluteImage = image?.startsWith('http') ? image : `${defaultSEOConfig.url}${image}`;
@@ -78,6 +80,13 @@ const SEO = ({
 
             {/* Canonical URL */}
             <link rel="canonical" href={absoluteUrl} />
+
+            {/* JSON-LD Structured Data */}
+            {schema && (
+                <script type="application/ld+json">
+                    {JSON.stringify(schema)}
+                </script>
+            )}
         </Helmet>
     );
 };

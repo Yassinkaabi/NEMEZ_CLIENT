@@ -96,3 +96,38 @@ export const generatePageSEO = (
         url: path ? `${defaultSEOConfig.url}${path}` : defaultSEOConfig.url,
     };
 };
+
+// Helper function to generate Product JSON-LD Schema
+export const generateProductSchema = (product: {
+    name: string;
+    description: string;
+    price: number;
+    images: string[];
+    categoryId?: { name: string };
+    variants?: Array<{ stock: number }>;
+    // slug: string;
+    createdAt?: string;
+}) => {
+    const totalStock = product.variants?.reduce((sum, v) => sum + v.stock, 0) || 0;
+
+    return {
+        '@context': 'https://schema.org/',
+        '@type': 'Product',
+        'name': product.name,
+        'image': product.images.map(img => img.startsWith('http') ? img : `${defaultSEOConfig.url}${img}`),
+        'description': product.description,
+        'sku': product.name,
+        'brand': {
+            '@type': 'Brand',
+            'name': 'NEMEZ'
+        },
+        'offers': {
+            '@type': 'Offer',
+            'url': `${defaultSEOConfig.url}/product/${product.name}`,
+            'priceCurrency': 'TND',
+            'price': product.price,
+            'itemCondition': 'https://schema.org/NewCondition',
+            'availability': totalStock > 0 ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock'
+        }
+    };
+};
