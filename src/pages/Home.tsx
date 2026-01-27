@@ -5,6 +5,8 @@ import ProductCard from '../components/ProductCard';
 import { ArrowRightOutlined } from '@ant-design/icons';
 import { useRef, useState, useEffect } from 'react';
 import AdvertisementCarousel from '../components/AdvertisementCarousel';
+import SEO from '../components/SEO';
+import { defaultSEOConfig } from '../config/seo.config';
 
 const { Title, Paragraph } = Typography;
 
@@ -54,6 +56,13 @@ const Home = () => {
 
     return (
         <div style={{ background: '#F7F7F8', minHeight: '100vh' }}>
+            {/* SEO Meta Tags */}
+            <SEO
+                title={defaultSEOConfig.title}
+                description={defaultSEOConfig.description}
+                url={defaultSEOConfig.url}
+            />
+
             {/* Hero Carousel */}
             <Carousel
                 autoplay
@@ -70,7 +79,7 @@ const Home = () => {
                             }}
                         >
                             <div className="hero-content">
-                                <Title level={1} className="hero-title" style={{marginBottom:'20px'}}>
+                                <Title level={1} className="hero-title" style={{ marginBottom: '20px' }}>
                                     {slide.title}
                                 </Title>
                                 <Paragraph className="hero-subtitle">

@@ -11,6 +11,8 @@ import { useAppDispatch, useAppSelector } from '../store/redux';
 import ReviewList from '../components/ReviewList';
 import type { RootState } from '../store';
 import { Typography } from 'antd';
+import SEO from '../components/SEO';
+import { generateProductSEO } from '../config/seo.config';
 
 
 const { Title } = Typography;
@@ -175,6 +177,11 @@ const Product = () => {
 
     return (
         <div className="product-page">
+            {/* SEO Meta Tags */}
+            {product && (
+                <SEO {...generateProductSEO(product)} />
+            )}
+
             {/* Navigation */}
             <nav className="product-nav">
                 <button className="back-button" onClick={handleBack}>

@@ -4,6 +4,8 @@ import { Row, Col, Collapse, Checkbox, Slider, Pagination, Spin, Typography } fr
 import { useQuery } from '@tanstack/react-query';
 import { api } from '../services/api';
 import ProductCard from '../components/ProductCard';
+import SEO from '../components/SEO';
+import { generateCategorySEO } from '../config/seo.config';
 
 const { Title } = Typography;
 const { Panel } = Collapse;
@@ -36,6 +38,7 @@ const Category = () => {
 
     const products = data?.data?.products || [];
     const pagination = data?.data?.pagination || {};
+    const category = products[0]?.categoryId; // Get category from first product
 
     const sizeOptions = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
 
@@ -51,6 +54,15 @@ const Category = () => {
 
     return (
         <div style={{ maxWidth: 1200, margin: '40px auto', padding: '0 20px' }}>
+            {/* SEO Meta Tags */}
+            {category && (
+                <SEO {...generateCategorySEO({
+                    name: category.name,
+                    description: category.description,
+                    id: category._id
+                })} />
+            )}
+
             <Row gutter={[24, 24]}>
                 {/* Filtres */}
                 <Col xs={24} lg={6}>
