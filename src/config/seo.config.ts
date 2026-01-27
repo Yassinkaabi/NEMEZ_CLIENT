@@ -11,6 +11,7 @@ export interface SEOConfig {
     type: string;
     twitterCard: string;
     twitterSite?: string;
+    fbAppId?: string;
 }
 
 export interface ProductSEO {
@@ -22,6 +23,7 @@ export interface ProductSEO {
     availability?: string;
     brand?: string;
     category?: string;
+    updatedTime?: string;
 }
 
 // Default site configuration
@@ -34,6 +36,7 @@ export const defaultSEOConfig: SEOConfig = {
     locale: 'fr_FR',
     type: 'website',
     twitterCard: 'summary_large_image',
+    fbAppId: '', // Your Facebook App ID
 };
 
 // Helper function to generate product SEO data
@@ -45,6 +48,7 @@ export const generateProductSEO = (product: {
     categoryId?: { name: string };
     variants?: Array<{ stock: number }>;
     slug: string;
+    createdAt?: string;
 }): ProductSEO & { url: string; type: string } => {
     const totalStock = product.variants?.reduce((sum, v) => sum + v.stock, 0) || 0;
     const availability = totalStock > 0 ? 'in stock' : 'out of stock';
@@ -60,6 +64,7 @@ export const generateProductSEO = (product: {
         category: product.categoryId?.name,
         url: `${defaultSEOConfig.url}/product/${product.slug}`,
         type: 'product',
+        updatedTime: product.createdAt ? new Date(product.createdAt).toISOString() : new Date().toISOString(),
     };
 };
 

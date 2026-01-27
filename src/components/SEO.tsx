@@ -13,6 +13,8 @@ interface SEOProps {
     availability?: string;
     brand?: string;
     category?: string;
+    updatedTime?: string;
+    fbAppId?: string;
 }
 
 const SEO = ({
@@ -26,6 +28,8 @@ const SEO = ({
     availability,
     brand,
     category,
+    updatedTime,
+    fbAppId = defaultSEOConfig.fbAppId,
 }: SEOProps) => {
     // Ensure image URL is absolute
     const absoluteImage = image?.startsWith('http') ? image : `${defaultSEOConfig.url}${image}`;
@@ -43,10 +47,13 @@ const SEO = ({
             <meta property="og:title" content={title} />
             <meta property="og:description" content={description} />
             <meta property="og:image" content={absoluteImage} />
+            <meta property="og:image:alt" content={title} />
             <meta property="og:image:width" content="1200" />
             <meta property="og:image:height" content="630" />
             <meta property="og:site_name" content={defaultSEOConfig.siteName} />
             <meta property="og:locale" content={defaultSEOConfig.locale} />
+            {fbAppId && <meta property="fb:app_id" content={fbAppId} />}
+            {updatedTime && <meta property="og:updated_time" content={updatedTime} />}
 
             {/* Product-specific Open Graph tags */}
             {type === 'product' && price && (
